@@ -7,6 +7,41 @@ import {
     EllipsisHorizontalIcon,
     MapPinIcon,
 } from '@heroicons/vue/20/solid';
+import {
+    eachDayOfInterval,
+    format,
+    isMonday,
+    isSameDay,
+    isSameMonth,
+    isSunday,
+    isToday,
+    lastDayOfMonth,
+    nextSunday,
+    previousMonday,
+    startOfMonth,
+} from 'date-fns';
+import { ref } from 'vue';
+
+const selectedDate = ref(new Date());
+
+function formatRaw(item: any) {
+    return {
+        date: format(item, 'yyyy-MM-dd'),
+        isCurrentMonth: isSameMonth(item, selectedDate.value) || false,
+        isToday: isToday(item) || false,
+        isSelected: isSameDay(item, selectedDate.value) || false,
+    };
+}
+let firstDay: Date = startOfMonth(selectedDate.value);
+let lastDay: Date = lastDayOfMonth(selectedDate.value);
+
+if (!isMonday(startOfMonth(selectedDate.value))) {
+    firstDay = previousMonday(startOfMonth(selectedDate.value));
+}
+
+if (!isSunday(lastDayOfMonth(selectedDate.value))) {
+    lastDay = nextSunday(lastDayOfMonth(selectedDate.value));
+}
 
 const meetings = [
     {
@@ -60,53 +95,72 @@ const meetings = [
         location: 'The Glasgow Green',
     },
 ];
-const days: Array<any> = [
-    { date: '2021-12-27' },
-    { date: '2021-12-28' },
-    { date: '2021-12-29' },
-    { date: '2021-12-30' },
-    { date: '2021-12-31' },
-    { date: '2022-01-01', isCurrentMonth: true },
-    { date: '2022-01-02', isCurrentMonth: true },
-    { date: '2022-01-03', isCurrentMonth: true },
-    { date: '2022-01-04', isCurrentMonth: true },
-    { date: '2022-01-05', isCurrentMonth: true },
-    { date: '2022-01-06', isCurrentMonth: true },
-    { date: '2022-01-07', isCurrentMonth: true },
-    { date: '2022-01-08', isCurrentMonth: true },
-    { date: '2022-01-09', isCurrentMonth: true },
-    { date: '2022-01-10', isCurrentMonth: true },
-    { date: '2022-01-11', isCurrentMonth: true },
-    { date: '2022-01-12', isCurrentMonth: true, isToday: true, isSelected: true },
-    { date: '2022-01-13', isCurrentMonth: true },
-    { date: '2022-01-14', isCurrentMonth: true },
-    { date: '2022-01-15', isCurrentMonth: true },
-    { date: '2022-01-16', isCurrentMonth: true },
-    { date: '2022-01-17', isCurrentMonth: true },
-    { date: '2022-01-18', isCurrentMonth: true },
-    { date: '2022-01-19', isCurrentMonth: true },
-    { date: '2022-01-20', isCurrentMonth: true },
-    { date: '2022-01-21', isCurrentMonth: true },
-    { date: '2022-01-22', isCurrentMonth: true },
-    { date: '2022-01-23', isCurrentMonth: true },
-    { date: '2022-01-24', isCurrentMonth: true },
-    { date: '2022-01-25', isCurrentMonth: true },
-    { date: '2022-01-26', isCurrentMonth: true },
-    { date: '2022-01-27', isCurrentMonth: true },
-    { date: '2022-01-28', isCurrentMonth: true },
-    { date: '2022-01-29', isCurrentMonth: true },
-    { date: '2022-01-30', isCurrentMonth: true },
-    { date: '2022-01-31', isCurrentMonth: true },
-    { date: '2022-02-01' },
-    { date: '2022-02-02' },
-    { date: '2022-02-03' },
-    { date: '2022-02-04' },
-    { date: '2022-02-05' },
-    { date: '2022-02-06' },
-];
+
+const rawDaysThisMonth: Array<Date> = eachDayOfInterval({
+    start: firstDay,
+    end: lastDay,
+});
+
+const days: Array<object> = rawDaysThisMonth.map(formatRaw);
+
+console.log(firstDay, selectedDate.value);
+
+// const days: Array<any> = [
+//     { date: '2021-12-27' },
+//     { date: '2021-12-28' },
+//     { date: '2021-12-29' },
+//     { date: '2021-12-30' },
+//     { date: '2021-12-31' },
+//     { date: '2022-01-01', isCurrentMonth: true },
+//     { date: '2022-01-02', isCurrentMonth: true },
+//     { date: '2022-01-03', isCurrentMonth: true },
+//     { date: '2022-01-04', isCurrentMonth: true },
+//     { date: '2022-01-05', isCurrentMonth: true },
+//     { date: '2022-01-06', isCurrentMonth: true },
+//     { date: '2022-01-07', isCurrentMonth: true },
+//     { date: '2022-01-08', isCurrentMonth: true },
+//     { date: '2022-01-09', isCurrentMonth: true },
+//     { date: '2022-01-10', isCurrentMonth: true },
+//     { date: '2022-01-11', isCurrentMonth: true },
+//     {
+//         date: '2022-01-12',
+//         isCurrentMonth: true,
+//         isToday: true,
+//         isSelected: true,
+//     },
+//     { date: '2022-01-13', isCurrentMonth: true },
+//     { date: '2022-01-14', isCurrentMonth: true },
+//     { date: '2022-01-15', isCurrentMonth: true },
+//     { date: '2022-01-16', isCurrentMonth: true },
+//     { date: '2022-01-17', isCurrentMonth: true },
+//     { date: '2022-01-18', isCurrentMonth: true },
+//     { date: '2022-01-19', isCurrentMonth: true },
+//     { date: '2022-01-20', isCurrentMonth: true },
+//     { date: '2022-01-21', isCurrentMonth: true },
+//     { date: '2022-01-22', isCurrentMonth: true },
+//     { date: '2022-01-23', isCurrentMonth: true },
+//     { date: '2022-01-24', isCurrentMonth: true },
+//     { date: '2022-01-25', isCurrentMonth: true },
+//     { date: '2022-01-26', isCurrentMonth: true },
+//     { date: '2022-01-27', isCurrentMonth: true },
+//     { date: '2022-01-28', isCurrentMonth: true },
+//     { date: '2022-01-29', isCurrentMonth: true },
+//     { date: '2022-01-30', isCurrentMonth: true },
+//     { date: '2022-01-31', isCurrentMonth: true },
+//     { date: '2022-02-01' },
+//     { date: '2022-02-02' },
+//     { date: '2022-02-03' },
+//     { date: '2022-02-04' },
+//     { date: '2022-02-05' },
+//     { date: '2022-02-06' },
+// ];
 
 function CheckWorking() {
-    alert('Working');
+    alert();
+}
+
+function changeSelectedDate(date: Date) {
+    selectedDate.value = date;
 }
 </script>
 
@@ -128,7 +182,9 @@ function CheckWorking() {
                         <span class="sr-only">Previous month</span>
                         <ChevronLeftIcon class="size-5" aria-hidden="true" />
                     </button>
-                    <div class="flex-auto text-sm font-semibold">January</div>
+                    <div class="flex-auto text-sm font-semibold">
+                        {{ format(selectedDate, 'MMMM') }}
+                    </div>
                     <button
                         @click="CheckWorking()"
                         type="button"
@@ -154,6 +210,9 @@ function CheckWorking() {
                 >
                     <button
                         v-for="day in days"
+                        @click="changeSelectedDate(new Date(day.date))"
+                        :model-value="selectedDate"
+                        @update:model-value="selectedDate = day.date"
                         :key="day.date"
                         type="button"
                         :data-is-current-month="

@@ -4,6 +4,9 @@ import DatePicker from '@/components/DatePicker.vue';
 import PlaceholderPattern from '@/components/PlaceholderPattern.vue';
 import { dashboard } from '@/routes';
 
+defineProps({
+    logo: String,
+});
 defineOptions({
     layout: {
         breadcrumbs: [
@@ -40,7 +43,7 @@ defineOptions({
             </div>
         </div>
         <div
-            class="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border"
+            class="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 p-6 md:min-h-min dark:border-sidebar-border"
         >
             <DatePicker />
         </div>
