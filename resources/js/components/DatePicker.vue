@@ -7,6 +7,8 @@ import {
     EllipsisHorizontalIcon,
     MapPinIcon,
 } from '@heroicons/vue/20/solid';
+import type { EachDayOfIntervalOptions} from 'date-fns';
+import { addMonths, subMonths } from 'date-fns';
 import {
     eachDayOfInterval,
     format,
@@ -20,7 +22,8 @@ import {
     previousMonday,
     startOfMonth,
 } from 'date-fns';
-import { ref } from 'vue';
+import type { ComputedRef } from 'vue';
+import { computed, ref } from 'vue';
 
 const selectedDate = ref(new Date());
 
@@ -32,16 +35,22 @@ function formatRaw(item: any) {
         isSelected: isSameDay(item, selectedDate.value) || false,
     };
 }
-let firstDay: Date = startOfMonth(selectedDate.value);
-let lastDay: Date = lastDayOfMonth(selectedDate.value);
 
-if (!isMonday(startOfMonth(selectedDate.value))) {
-    firstDay = previousMonday(startOfMonth(selectedDate.value));
-}
+const firstDay: ComputedRef<Date> = computed(() => {
+    if (!isMonday(startOfMonth(selectedDate.value))) {
+        return previousMonday(startOfMonth(selectedDate.value));
+    } else {
+        return startOfMonth(selectedDate.value);
+    }
+});
 
-if (!isSunday(lastDayOfMonth(selectedDate.value))) {
-    lastDay = nextSunday(lastDayOfMonth(selectedDate.value));
-}
+const lastDay: ComputedRef<Date> = computed(() => {
+    if (!isSunday(lastDayOfMonth(selectedDate.value))) {
+        return nextSunday(lastDayOfMonth(selectedDate.value));
+    } else {
+        return lastDayOfMonth(selectedDate.value);
+    }
+});
 
 const meetings = [
     {
@@ -96,14 +105,35 @@ const meetings = [
     },
 ];
 
-const rawDaysThisMonth: Array<Date> = eachDayOfInterval({
-    start: firstDay,
-    end: lastDay,
+const rawDaysThisMonth: ComputedRef<
+    Array<
+        undefined extends EachDayOfIntervalOptions<infer DateType>
+            ? DateType
+            : Date extends Date
+              ? Date
+              : Date extends Date
+                ? Date
+                : Date
+    >
+> = computed(() => {
+    return eachDayOfInterval({
+        start: firstDay.value,
+        end: lastDay.value,
+    });
 });
 
-const days: Array<object> = rawDaysThisMonth.map(formatRaw);
+const days: ComputedRef<
+    {
+        date: string;
+        isCurrentMonth: boolean;
+        isToday: boolean;
+        isSelected: boolean;
+    }[]
+> = computed(() => {
+    return rawDaysThisMonth.value.map(formatRaw);
+});
 
-console.log(firstDay, selectedDate.value);
+// console.log(firstDay.value, selectedDate.value);
 
 // const days: Array<any> = [
 //     { date: '2021-12-27' },
@@ -155,12 +185,20 @@ console.log(firstDay, selectedDate.value);
 //     { date: '2022-02-06' },
 // ];
 
-function CheckWorking() {
-    alert();
+function previousMonth() {
+    selectedDate.value = subMonths(startOfMonth(selectedDate.value), 1);
+}
+
+function nextMonth() {
+    selectedDate.value = addMonths(startOfMonth(selectedDate.value), 1);
 }
 
 function changeSelectedDate(date: Date) {
     selectedDate.value = date;
+}
+
+function dayNumber(date: string) {
+    return format(date, 'd');
 }
 </script>
 
@@ -175,7 +213,7 @@ function changeSelectedDate(date: Date) {
             >
                 <div class="flex items-center text-gray-900 dark:text-white">
                     <button
-                        @click="CheckWorking()"
+                        @click="previousMonth()"
                         type="button"
                         class="-m-1.5 flex flex-none items-center justify-center p-1.5 text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-white"
                     >
@@ -186,7 +224,7 @@ function changeSelectedDate(date: Date) {
                         {{ format(selectedDate, 'MMMM') }}
                     </div>
                     <button
-                        @click="CheckWorking()"
+                        @click="nextMonth()"
                         type="button"
                         class="-m-1.5 flex flex-none items-center justify-center p-1.5 text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-white"
                     >
@@ -211,8 +249,7 @@ function changeSelectedDate(date: Date) {
                     <button
                         v-for="day in days"
                         @click="changeSelectedDate(new Date(day.date))"
-                        :model-value="selectedDate"
-                        @update:model-value="selectedDate = day.date"
+                        @update:model-value="selectedDate = new Date(day.date)"
                         :key="day.date"
                         type="button"
                         :data-is-current-month="
@@ -226,7 +263,7 @@ function changeSelectedDate(date: Date) {
                             :datetime="day.date"
                             class="mx-auto flex size-7 items-center justify-center rounded-full in-data-is-selected:not-in-data-is-today:bg-gray-900 in-data-is-selected:in-data-is-today:bg-indigo-600 dark:in-data-is-selected:not-in-data-is-today:bg-white dark:in-data-is-selected:in-data-is-today:bg-indigo-500"
                             >{{
-                                day.date.split('-').pop().replace(/^0/, '')
+                                dayNumber(day.date)
                             }}</time
                         >
                     </button>
