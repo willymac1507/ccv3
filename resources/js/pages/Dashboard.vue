@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
-import DatePicker from '@/components/DatePicker.vue';
+import { provide } from 'vue';
+import DashMainSection from '@/components/DashMainSection.vue';
 import PlaceholderPattern from '@/components/PlaceholderPattern.vue';
 import { dashboard } from '@/routes';
 
-defineProps({
+const props = defineProps({
     logo: String,
+    appointmentsAsStudent: Array,
 });
 defineOptions({
     layout: {
@@ -17,6 +19,8 @@ defineOptions({
         ],
     },
 });
+
+provide('appointments', props.appointmentsAsStudent);
 </script>
 
 <template>
@@ -43,9 +47,9 @@ defineOptions({
             </div>
         </div>
         <div
-            class="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 p-6 md:min-h-min dark:border-sidebar-border"
+            class="relative min-h-screen flex-1 rounded-xl border border-sidebar-border/70 p-6 md:min-h-min dark:border-sidebar-border"
         >
-            <DatePicker />
+            <DashMainSection />
         </div>
     </div>
 </template>
