@@ -1,14 +1,19 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
-import { provide } from 'vue';
+import type { ComputedRef } from 'vue';
+import { computed, provide } from 'vue';
 import DashMainSection from '@/components/DashMainSection.vue';
 import PlaceholderPattern from '@/components/PlaceholderPattern.vue';
 import { dashboard } from '@/routes';
 
-const props = defineProps({
-    logo: String,
-    appointmentsAsStudent: Array,
-});
+interface Props {
+    logo: string;
+    appointmentsAsStudent: Array<any>;
+    date: string;
+}
+
+const props = defineProps<Props>();
+
 defineOptions({
     layout: {
         breadcrumbs: [
@@ -20,7 +25,9 @@ defineOptions({
     },
 });
 
-provide('appointments', props.appointmentsAsStudent);
+const appointments: ComputedRef<any[] | undefined> = computed(() => props.appointmentsAsStudent);
+console.log(props.appointmentsAsStudent);
+provide('appointments', appointments);
 </script>
 
 <template>
@@ -49,7 +56,7 @@ provide('appointments', props.appointmentsAsStudent);
         <div
             class="relative min-h-screen flex-1 rounded-xl border border-sidebar-border/70 p-6 md:min-h-min dark:border-sidebar-border"
         >
-            <DashMainSection />
+            <DashMainSection :date='date' />
         </div>
     </div>
 </template>

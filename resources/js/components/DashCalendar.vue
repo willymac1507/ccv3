@@ -16,14 +16,13 @@ import {
     startOfMonth,
     subMonths,
 } from 'date-fns';
-import type { ComputedRef, Ref} from 'vue';
+import type { ComputedRef, Ref } from 'vue';
 import { ref } from 'vue';
 import { computed } from 'vue';
 
 const parentDate = defineModel<Date>();
 
-const selectedDate: Ref = ref(new Date());
-parentDate.value = selectedDate.value;
+const selectedDate: Ref = ref(parentDate.value || new Date());
 
 function formatRaw(item: any) {
     return {
@@ -89,7 +88,6 @@ function nextMonth() {
 function changeSelectedDate(date: Date) {
     selectedDate.value = date;
     parentDate.value = date;
-
 }
 
 function dayNumber(date: string) {

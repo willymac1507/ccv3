@@ -5,9 +5,28 @@ import {
     EllipsisHorizontalIcon,
     MapPinIcon,
 } from '@heroicons/vue/20/solid';
-import { inject } from 'vue';
+import { router } from '@inertiajs/vue3';
+import { format } from 'date-fns';
+import { ModelRef, watch } from 'vue';
 
-const meetings: Array<any> | undefined = inject('appointments');
+interface Props {
+    meetings: Array<any> | undefined;
+}
+
+const props = defineProps<Props>();
+
+const parentDate: ModelRef<any> = defineModel();
+
+watch(parentDate, (value) =>
+    router.get(
+        '/dashboard',
+        { date: format(value, 'yyyy-MM-dd') },
+        {
+            preserveState: true,
+            preserveScroll: true,
+        },
+    ),
+);
 </script>
 
 <template>
@@ -15,16 +34,15 @@ const meetings: Array<any> | undefined = inject('appointments');
         class="mt-4 divide-y divide-gray-100 text-sm/6 lg:col-span-7 xl:col-span-8 dark:divide-white/10"
     >
         <li
-            v-for="meeting in meetings"
+            v-for="meeting in props.meetings"
             :key="meeting.id"
             class="relative flex gap-x-6 py-6 xl:static"
         >
-
             <div class="flex-auto">
                 <h3
                     class="pr-10 font-semibold text-gray-900 xl:pr-0 dark:text-white"
                 >
-                    {{ meeting.description }}
+                    {{ meeting.client.name }}
                 </h3>
                 <dl
                     class="mt-2 flex flex-col text-gray-500 xl:flex-row dark:text-gray-400"
@@ -39,7 +57,8 @@ const meetings: Array<any> | undefined = inject('appointments');
                         </dt>
                         <dd>
                             <time :datetime="meeting.datetime"
-                                >{{ meeting.date }} at
+                                >{{ format(meeting.date, 'EEE do MMM yyyy') }}
+                                at
                                 {{ meeting.time }}
                             </time>
                         </dd>
