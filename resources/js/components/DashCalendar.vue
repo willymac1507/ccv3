@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/vue/20/solid';
+import { router } from '@inertiajs/vue3';
 import type { EachDayOfIntervalOptions } from 'date-fns';
 import {
     addMonths,
@@ -93,6 +94,12 @@ function changeSelectedDate(date: Date) {
 function dayNumber(date: string) {
     return format(date, 'd');
 }
+
+function goToToday() {
+    // selectedDate.value = new Date();
+    // parentDate.value = selectedDate.value;
+    router.get('/dashboard');
+}
 </script>
 
 <template>
@@ -120,6 +127,7 @@ function dayNumber(date: string) {
                 <ChevronRightIcon class="size-5" aria-hidden="true" />
             </button>
         </div>
+        <div class="flex w-full items-center mt-4"><button class="btn btn-primary mx-auto" @click="goToToday">Today</button></div>
         <div
             class="mt-6 grid grid-cols-7 text-xs/6 text-gray-500 dark:text-gray-400"
         >

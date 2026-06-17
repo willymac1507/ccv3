@@ -7,7 +7,8 @@ import {
 } from '@heroicons/vue/20/solid';
 import { router } from '@inertiajs/vue3';
 import { format } from 'date-fns';
-import { ModelRef, watch } from 'vue';
+import type { ModelRef} from 'vue';
+import { watch } from 'vue';
 
 interface Props {
     meetings: Array<any> | undefined;
@@ -110,7 +111,7 @@ watch(parentDate, (value) =>
                                             : 'text-gray-700 dark:text-gray-300',
                                         'block px-4 py-2 text-sm',
                                     ]"
-                                    >Edit</a
+                                    >Open</a
                                 >
                             </MenuItem>
                             <MenuItem v-slot="{ active }">
