@@ -16,12 +16,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()
+        $user = User::factory()
             ->create([
                 'id' => 9999,
                 'name' => 'Will McCloy',
                 'email' => 'will@email.com',
             ]);
+        $user->assignRole(Role::findByName('Super Admin'));
 
         User::factory(20)
             ->hasAppointmentsAsClient(2)
