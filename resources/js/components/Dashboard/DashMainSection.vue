@@ -1,8 +1,9 @@
 <script setup lang="ts">
+
 import type { Ref} from 'vue';
 import { inject, ref } from 'vue';
-import DashAppointments from '@/components/DashAppointments.vue';
-import DashCalendar from '@/components/DashCalendar.vue';
+import DashAppointments from '@/components/Dashboard/DashAppointments.vue';
+import DashCalendar from '@/components/Dashboard/DashCalendar.vue';
 
 interface Props {
     date: string | number | Date;

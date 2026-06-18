@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Appointment;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,12 +16,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        Appointment::factory(10)
-            ->create();
+        User::factory()
+            ->create([
+                'id' => 9999,
+                'name' => 'Will McCloy',
+                'email' => 'will@email.com',
+            ]);
 
-        //        User::factory()->create([
-        //            'name' => 'Test User',
-        //            'email' => 'test@example.com',
-        //        ]);
+        User::factory(20)
+            ->hasAppointmentsAsClient(2)
+            ->create()
+            ->each(function ($user) {
+                $user->assignRole(Role::findByName('Client'));
+            });
     }
 }

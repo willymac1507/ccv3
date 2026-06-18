@@ -2,9 +2,9 @@
 import { Head } from '@inertiajs/vue3';
 import type { ComputedRef } from 'vue';
 import { computed, provide } from 'vue';
-import DashMainSection from '@/components/DashMainSection.vue';
 import PlaceholderPattern from '@/components/PlaceholderPattern.vue';
 import { dashboard } from '@/routes';
+import DashMainSection from '../components/Dashboard/DashMainSection.vue';
 
 interface Props {
     logo: string;
