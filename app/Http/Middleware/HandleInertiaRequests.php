@@ -26,6 +26,40 @@ class HandleInertiaRequests extends Middleware
         return parent::version($request);
     }
 
+    public function setNavItems(Request $request): ?array
+    {
+        $standardNavItems = [
+            [
+                'title' => 'Dashboard',
+                'href' => '/dashboard',
+                'icon' => 'fa-solid fa-tachograph-digital',
+            ],
+            [
+                'title' => 'Appointments',
+                'href' => '#',
+                'icon' => 'fa-solid fa-calendar-days',
+            ],
+            [
+                'title' => 'Messages',
+                'href' => '#',
+                'icon' => 'fa-solid fa-envelope',
+            ],
+        ];
+
+        $superAdminNavItems = [
+            [
+                'title' => 'Organisations',
+                'href' => '/admin/super/organisations',
+                'icon' => 'fa-solid fa-building',
+            ],
+        ];
+
+        if (! $request->user()->hasRole('Super Admin')) {
+            return $standardNavItems;
+        }
+        return array_merge($standardNavItems, $superAdminNavItems);
+    }
+
     /**
      * Define the props that are shared by default.
      *
@@ -42,6 +76,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'mainNavItems' => $this->setNavItems($request),
         ];
     }
 }

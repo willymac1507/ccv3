@@ -1,3 +1,6 @@
+import { library } from '@fortawesome/fontawesome-svg-core';
+import {faBuilding, faTachographDigital, faEnvelope, faCalendarDays } from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { initializeTheme } from '@/composables/useAppearance';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -5,6 +8,7 @@ import AuthLayout from '@/layouts/AuthLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { initializeFlashToast } from '@/lib/flashToast';
 
+library.add(faBuilding, faTachographDigital, faEnvelope, faCalendarDays);
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
@@ -24,6 +28,9 @@ createInertiaApp({
     progress: {
         color: '#4B5563',
     },
+    withApp(app) {
+        app.component('font-awesome-icon', FontAwesomeIcon)
+    }
 });
 
 // This will set light / dark mode on page load...

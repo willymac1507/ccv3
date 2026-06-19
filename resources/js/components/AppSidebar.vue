@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-import { Mail, CalendarSearch, BookOpen, FolderGit2, LayoutGrid } from '@lucide/vue';
+import { Link, usePage } from '@inertiajs/vue3';
+import {
+    BookOpen,
+    FolderGit2,
+} from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -17,28 +20,7 @@ import {
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Appointments',
-        href: '#',
-        icon: CalendarSearch,
-    },
-    {
-        title: 'Messages',
-        href: '#',
-        icon: Mail,
-    },
-    {
-        title: 'Organisations',
-        href: '/admin/super/organisations',
-        icon: LayoutGrid,
-    }
-];
+const mainNavItems: any = usePage().props.mainNavItems;
 
 const footerNavItems: NavItem[] = [
     {

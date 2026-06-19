@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import { Link } from '@inertiajs/vue3';
 import {
     SidebarGroup,
@@ -28,7 +29,7 @@ const { isCurrentUrl } = useCurrentUrl();
                     :tooltip="item.title"
                 >
                     <Link :href="item.href">
-                        <component :is="item.icon" />
+                        <FontAwesomeIcon :icon="item.icon" />
                         <span>{{ item.title }}</span>
                     </Link>
                 </SidebarMenuButton>
