@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use App\Models\Service;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -54,10 +55,16 @@ class HandleInertiaRequests extends Middleware
             ],
         ];
 
-        if (! $request->user()->hasRole('Super Admin')) {
-            return $standardNavItems;
+        if ($request->user()) {
+
+            if (! $request->user()->hasRole('Super Admin')) {
+                return $standardNavItems;
+            }
+
+            return array_merge($standardNavItems, $superAdminNavItems);
         }
-        return array_merge($standardNavItems, $superAdminNavItems);
+
+        return null;
     }
 
     /**
@@ -74,7 +81,10 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'auth' => [
                 'user' => $request->user(),
+                'services' => $request->user()->services,
             ],
+            'services' => Service::all(),
+            'slots' => [],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'mainNavItems' => $this->setNavItems($request),
         ];

@@ -29,7 +29,7 @@ const { isCurrentUrl } = useCurrentUrl();
                     :tooltip="item.title"
                 >
                     <Link :href="item.href">
-                        <FontAwesomeIcon :icon="item.icon" />
+                        <FontAwesomeIcon :icon="item.icon? item.icon : 'home'" />
                         <span>{{ item.title }}</span>
                     </Link>
                 </SidebarMenuButton>

@@ -6,7 +6,7 @@ import { Toaster } from '@/components/ui/sonner';
 import type { BreadcrumbItem } from '@/types';
 
 type Props = {
-    breadcrumbs?: BreadcrumbItem[];
+    breadcrumbs: BreadcrumbItem[];
 };
 
 withDefaults(defineProps<Props>(), {
