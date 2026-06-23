@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import { Form, Head, usePage } from '@inertiajs/vue3';
-import type { ComputedRef} from 'vue';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
+import type { ComputedRef } from 'vue';
 import { ref } from 'vue';
 import { computed } from 'vue';
-import ServiceController from '@/actions/App/Http/Controllers/Settings/ServiceController';
 import Heading from '@/components/Heading.vue';
-import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 
 const page = usePage();
@@ -19,6 +17,11 @@ const servicesOfferedIds: ComputedRef = computed(() =>
 const serviceList: ComputedRef = computed(() => allServices);
 
 const checked = ref(servicesOfferedIds.value);
+const form = ref(
+    useForm({
+        selectedServices: checked.value,
+    }),
+);
 </script>
 
 <template>
@@ -33,10 +36,9 @@ const checked = ref(servicesOfferedIds.value);
             description="Select which services you offer"
         />
 
-        <Form
-            v-bind="ServiceController.update.form()"
+        <form
+            @submit.prevent="form.post('/settings/services')"
             class="space-y-6"
-            v-slot="{ errors, processing }"
         >
             <div class="flex w-1/2 flex-col gap-2">
                 <label
@@ -49,17 +51,15 @@ const checked = ref(servicesOfferedIds.value);
                     <input
                         type="checkbox"
                         :value="service.id"
-                        v-model="checked"
+                        v-model="form.selectedServices"
                         class="checkbox ml-auto border border-gray-400 checkbox-sm"
                         :id="'service' + service.id"
-                        :name="'service' + service.id"
+                        name="form.selectedServices[]"
                     />
                 </label>
-
-                <InputError class="mt-2" :message="errors.name" />
             </div>
-            <Button class="mt-2" :disabled="processing">Update</Button>
-        </Form>
+            <Button class="mt-2">Update</Button>
+        </form>
     </div>
 </template>
 

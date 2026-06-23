@@ -81,7 +81,7 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'auth' => [
                 'user' => $request->user(),
-                'services' => $request->user()->services,
+                'services' => $request->user() ? $request->user()->services : null,
             ],
             'services' => Service::all(),
             'slots' => [],

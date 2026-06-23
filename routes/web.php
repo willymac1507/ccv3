@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrganisationController;
+use App\Http\Controllers\Settings\ServiceController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
@@ -10,6 +11,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index',
         'logo' => asset('storage/images/logo.webp'),
     ])->name('dashboard');
+    Route::post('settings/services', [ServiceController::class, 'update']);
 });
 
 Route::middleware(['role:Super Admin'])->group(function () {

@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Settings\ProfileUpdateRequest;
-use App\Http\Requests\Settings\ServiceUpdateRequest;
 use App\Models\Service;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -27,16 +26,13 @@ class ServiceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(ServiceUpdateRequest $request): RedirectResponse
+    public function update(Request $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
-
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        $user = User::find($request->user()->id);
+        $servicesSelected = $request->selectedServices;
+        foreach ($servicesSelected as $service) {
+            $user->services()->sync($servicesSelected);
         }
-
-        $request->user()->save();
-
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Services updated.')]);
 
         return to_route('services.edit');
