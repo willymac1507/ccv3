@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -14,22 +14,30 @@ const sidebarNavItems: NavItem[] = [
     {
         title: 'Profile',
         href: editProfile(),
+        gate: 'Client',
     },
     {
         title: 'Services',
         href: editServices(),
+        gate: 'Student',
     },
     {
         title: 'Security',
         href: editSecurity(),
+        gate: 'Client',
     },
     {
         title: 'Appearance',
         href: editAppearance(),
+        gate: 'Client',
     },
 ];
 
 const { isCurrentOrParentUrl } = useCurrentUrl();
+
+const rolesRaw: any = usePage().props.auth.user.roles;
+const roles: Array<string> = rolesRaw.map((role: any) => role.name);
+
 </script>
 
 <template>
@@ -45,21 +53,26 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
                     class="flex flex-col space-y-1 space-x-0"
                     aria-label="Settings"
                 >
-                    <Button
+                    <div
                         v-for="item in sidebarNavItems"
                         :key="toUrl(item.href)"
-                        variant="ghost"
-                        :class="[
-                            'w-full justify-start',
-                            { 'bg-muted': isCurrentOrParentUrl(item.href) },
-                        ]"
-                        as-child
+                        class="space-y-1"
                     >
-                        <Link :href="item.href">
-                            <component :is="item.icon" class="h-4 w-4" />
-                            {{ item.title }}
-                        </Link>
-                    </Button>
+                        <Button
+                            v-if="roles.includes(<string>item.gate)"
+                            variant="ghost"
+                            :class="[
+                                'w-full justify-start',
+                                { 'bg-muted': isCurrentOrParentUrl(item.href) },
+                            ]"
+                            as-child
+                        >
+                            <Link :href="item.href">
+                                <component :is="item.icon" class="h-4 w-4" />
+                                {{ item.title }}
+                            </Link>
+                        </Button>
+                    </div>
                 </nav>
             </aside>
 

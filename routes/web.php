@@ -11,7 +11,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index',
         'logo' => asset('storage/images/logo.webp'),
     ])->name('dashboard');
-    Route::post('settings/services', [ServiceController::class, 'update']);
+
 });
 
 Route::middleware(['role:Super Admin'])->group(function () {

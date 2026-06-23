@@ -11,7 +11,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
+});
 
+Route::middleware(['auth', 'role:Student'])->group(function () {
     Route::get('settings/services', [ServiceController::class, 'edit'])->name('services.edit');
     Route::patch('settings/services', [ServiceController::class, 'update'])->name('services.update');
 });

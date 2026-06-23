@@ -37,7 +37,7 @@ const form = ref(
         />
 
         <form
-            @submit.prevent="form.post('/settings/services')"
+            @submit.prevent="form.patch('/settings/services')"
             class="space-y-6"
         >
             <div class="flex w-1/2 flex-col gap-2">
@@ -58,7 +58,7 @@ const form = ref(
                     />
                 </label>
             </div>
-            <Button class="mt-2">Update</Button>
+            <Button class="mt-2 cursor-pointer">Update</Button>
         </form>
     </div>
 </template>
