@@ -9,6 +9,7 @@ import { edit as editAppearance } from '@/routes/appearance';
 import { edit as editProfile } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
 import { edit as editServices } from '@/routes/services';
+import { edit as editSlots } from '@/routes/slots';
 import type { NavItem } from '@/types';
 const sidebarNavItems: NavItem[] = [
     {
@@ -19,6 +20,11 @@ const sidebarNavItems: NavItem[] = [
     {
         title: 'Services',
         href: editServices(),
+        gate: 'Student',
+    },
+    {
+        title: 'Time Slots',
+        href: editSlots(),
         gate: 'Student',
     },
     {

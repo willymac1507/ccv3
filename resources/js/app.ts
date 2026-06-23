@@ -31,7 +31,7 @@ createInertiaApp({
     withApp(app) {
         app.component('font-awesome-icon', FontAwesomeIcon)
     }
-});
+}).then(r => console.log(r));
 
 // This will set light / dark mode on page load...
 initializeTheme();

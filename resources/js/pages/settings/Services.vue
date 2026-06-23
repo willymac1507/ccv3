@@ -52,7 +52,7 @@ const form = ref(
                         type="checkbox"
                         :value="service.id"
                         v-model="form.selectedServices"
-                        class="checkbox ml-auto border border-gray-400 checkbox-sm"
+                        class="checkbox ml-auto border border-gray-500 checked:border-gray-300 checkbox-sm"
                         :id="'service' + service.id"
                         name="form.selectedServices[]"
                     />

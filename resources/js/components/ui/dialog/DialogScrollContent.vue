@@ -40,9 +40,8 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
         @pointer-down-outside="(event) => {
           const originalEvent = event.detail.originalEvent;
           const target = originalEvent.target as HTMLElement;
-          if (originalEvent.offsetX > target.clientWidth || originalEvent.offsetY > target.clientHeight) {
-            event.preventDefault();
-          }
+          (originalEvent.offsetX > target.clientWidth || originalEvent.offsetY > target.clientHeight) ?
+            event.preventDefault() : null;
         }"
       >
         <slot />
