@@ -12,7 +12,7 @@ class Service extends Model
     /** @use HasFactory<ServiceFactory> */
     use HasFactory;
 
-    public function users(): BelongsToMany
+    public function students(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'service_user');
     }

@@ -9,7 +9,7 @@ import { edit as editAppearance } from '@/routes/appearance';
 import { edit as editProfile } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
 import { edit as editServices } from '@/routes/services';
-import { edit as editSlots } from '@/routes/slots';
+import { index as indexShifts } from '@/routes/shifts';
 import type { NavItem } from '@/types';
 const sidebarNavItems: NavItem[] = [
     {
@@ -18,13 +18,13 @@ const sidebarNavItems: NavItem[] = [
         gate: 'Client',
     },
     {
-        title: 'Services',
-        href: editServices(),
-        gate: 'Student',
+        title: 'Availability',
+        href: indexShifts(),
+        gate: 'Student'
     },
     {
-        title: 'Time Slots',
-        href: editSlots(),
+        title: 'Services',
+        href: editServices(),
         gate: 'Student',
     },
     {

@@ -12,7 +12,7 @@ class Slot extends Model
     /** @use HasFactory<SlotFactory> */
     use HasFactory;
 
-    public function user(): BelongsToMany
+    public function student(): BelongsToMany
     {
         return $this->belongsToMany(User::class);
     }

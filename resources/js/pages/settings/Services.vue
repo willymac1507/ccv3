@@ -7,7 +7,6 @@ import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 
 const page = usePage();
-// const user: ComputedRef = computed(() => page.props.auth.user);
 const { services: allServices } = page.props;
 const { services: userServices } = page.props.auth.user;
 const servicesOffered: ComputedRef = computed(() => userServices);

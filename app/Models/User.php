@@ -59,6 +59,11 @@ class User extends Authenticatable implements AuthorizableContract
         return $this->hasMany(Appointment::class, 'client');
     }
 
+    public function shifts(): HasMany
+    {
+        return $this->hasMany(Shift::class);
+    }
+
     public function organisation(): BelongsTo
     {
         return $this->belongsTo(Organisation::class);

@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
                 'id' => 9999,
                 'name' => 'Will McCloy',
                 'email' => 'will@email.com',
+                'password' => bcrypt('password'),
             ]);
         $user->assignRole(Role::findByName('Super Admin'));
 

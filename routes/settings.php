@@ -3,7 +3,7 @@
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
 use App\Http\Controllers\Settings\ServiceController;
-use App\Http\Controllers\Settings\SlotController;
+use App\Http\Controllers\Settings\ShiftController;
 use Illuminate\Auth\Middleware\RequirePassword;
 use Illuminate\Support\Facades\Route;
 
@@ -17,8 +17,10 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'role:Student'])->group(function () {
     Route::get('settings/services', [ServiceController::class, 'edit'])->name('services.edit');
     Route::patch('settings/services', [ServiceController::class, 'update'])->name('services.update');
-    Route::get('settings/slots', [SlotController::class, 'edit'])->name('slots.edit');
-    Route::patch('settings/slots', [SlotController::class, 'update'])->name('slots.update');
+});
+
+Route::middleware(['auth', 'role:Student'])->group(function () {
+    Route::get('settings/shifts', [ShiftController::class, 'index'])->name('shifts.index');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
