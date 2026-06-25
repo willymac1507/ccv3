@@ -1,79 +1,170 @@
 <script setup lang="ts">
 import { Head, useForm, usePage } from '@inertiajs/vue3';
 import type { ComputedRef } from 'vue';
+import { capitalize } from 'vue';
 import { computed, ref } from 'vue';
 import Heading from '@/components/Heading.vue';
+import { Button } from '@/components/ui/button';
 
 const page = usePage();
 const studentShifts: ComputedRef = computed(() => page.props.auth.user.shifts);
 const currentShifts = ref(studentShifts.value.map(makeArray));
 
-
 function makeArray(shift: any) {
-    return [ shift.day, {
-        start: shift.startTime,
-        end: shift.endTime,
-        break: shift.breakTime,
-        breakDuration: shift.duration,
-    }]
+    return [
+        shift.day,
+        {
+            uuid: shift.uuid,
+            start: shift.startTime,
+            end: shift.endTime,
+            break: shift.breakTime,
+            breakDuration: shift.duration,
+        },
+    ];
+}
+
+const days: Array<string> = [
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
+    'sunday',
+];
+
+interface Form {
+    [key: string]: object;
+    monday: {
+        [key: string]: string;
+        uuid: string;
+        day: string;
+        start: string;
+        end: string;
+        break: string;
+        breakDuration: string;
+    };
+    tuesday: {
+        [key: string]: string;
+        uuid: string;
+        day: string;
+        start: string;
+        end: string;
+        break: string;
+        breakDuration: string;
+    };
+    wednesday: {
+        [key: string]: string;
+        uuid: string;
+        day: string;
+        start: string;
+        end: string;
+        break: string;
+        breakDuration: string;
+    };
+    thursday: {
+        [key: string]: string;
+        uuid: string;
+        day: string;
+        start: string;
+        end: string;
+        break: string;
+        breakDuration: string;
+    };
+    friday: {
+        [key: string]: string;
+        uuid: string;
+        day: string;
+        start: string;
+        end: string;
+        break: string;
+        breakDuration: string;
+    };
+    saturday: {
+        [key: string]: string;
+        uuid: string;
+        day: string;
+        start: string;
+        end: string;
+        break: string;
+        breakDuration: string;
+    };
+    sunday: {
+        [key: string]: string;
+        uuid: string;
+        day: string;
+        start: string;
+        end: string;
+        break: string;
+        breakDuration: string;
+    };
 }
 
 const form = ref(
-    useForm({
+    useForm<Form>({
         monday: {
+            day: currentShifts.value[0][0],
+            uuid: currentShifts.value[0][1].uuid,
             start: currentShifts.value[0][1].start,
             end: currentShifts.value[0][1].end,
             break: currentShifts.value[0][1].break,
             breakDuration: currentShifts.value[0][1].breakDuration,
         },
         tuesday: {
+            day: currentShifts.value[1][0],
+            uuid: currentShifts.value[1][1].uuid,
             start: currentShifts.value[1][1].start,
             end: currentShifts.value[1][1].end,
             break: currentShifts.value[1][1].break,
             breakDuration: currentShifts.value[1][1].breakDuration,
         },
         wednesday: {
+            day: currentShifts.value[2][0],
+            uuid: currentShifts.value[2][1].uuid,
             start: currentShifts.value[2][1].start,
             end: currentShifts.value[2][1].end,
             break: currentShifts.value[2][1].break,
             breakDuration: currentShifts.value[2][1].breakDuration,
         },
         thursday: {
+            day: currentShifts.value[3][0],
+            uuid: currentShifts.value[3][1].uuid,
             start: currentShifts.value[3][1].start,
             end: currentShifts.value[3][1].end,
             break: currentShifts.value[3][1].break,
             breakDuration: currentShifts.value[3][1].breakDuration,
         },
         friday: {
+            day: currentShifts.value[4][0],
+            uuid: currentShifts.value[4][1].uuid,
             start: currentShifts.value[4][1].start,
             end: currentShifts.value[4][1].end,
             break: currentShifts.value[4][1].break,
             breakDuration: currentShifts.value[4][1].breakDuration,
         },
         saturday: {
+            day: currentShifts.value[5][0],
+            uuid: currentShifts.value[5][1].uuid,
             start: currentShifts.value[5][1].start,
             end: currentShifts.value[5][1].end,
             break: currentShifts.value[5][1].break,
             breakDuration: currentShifts.value[5][1].breakDuration,
         },
         sunday: {
+            day: currentShifts.value[6][0],
+            uuid: currentShifts.value[6][1].uuid,
             start: currentShifts.value[6][1].start,
             end: currentShifts.value[6][1].end,
             break: currentShifts.value[6][1].break,
             breakDuration: currentShifts.value[6][1].breakDuration,
         },
-}));
-//
-// const currentShifts = reactive<Reactive<any>>({
-//     days: {
-//         day: null,
-//         start: null,
-//         end: null,
-//         break: null,
-//         breakDuration: null,
-//     },
-// });
+    }),
+);
 
+for (const day of days) {
+    console.log(day);
+    console.log(form.value[day]);
+}
 </script>
 
 <template>
@@ -88,50 +179,45 @@ const form = ref(
             description="Select the shifts you are working"
         />
     </div>
-    <form @submit.prevent class="space-y-6">
-        <div class="grid grid-cols-5 grid-rows-8 gap-y-4 text-sm">
-            <div class="col-start-2 text-left px-4">Start</div>
-            <div class="text-left px-4">End</div>
-            <div class="text-left px-4">Break</div>
+    <form @submit.prevent="form.patch('/settings/shifts')" class="space-y-6">
+        <div class="grid grid-cols-5 text-sm">
+            <div class="col-start-2 px-4 text-left">Start</div>
+            <div class="px-4 text-left">End</div>
+            <div class="px-4 text-left">Break</div>
             <div class="text-center">Duration</div>
-            <div class="row-start-2">Monday</div>
+        </div>
+        <div v-for="day in days" :key="day" class="grid grid-cols-5 text-sm">
+            <div>{{ capitalize(day) }}</div>
             <input
                 type="time"
-                name="mondayStart"
-                id="mondayStart"
+                :name="day + 'Start'"
+                :id="day + 'Start'"
                 class="col-start-2 px-4"
-                v-model="form.monday.start"
+                v-model="form[day].start"
             />
             <input
                 type="time"
-                name="mondayEnd"
-                id="mondayEnd"
-                class="col-start-3 px-4"
-                v-model="form.monday.end"
+                :name="day + 'End'"
+                :id="day + 'End'"
+                class="px-4"
+                v-model="form[day].end"
             />
             <input
                 type="time"
-                name="mondayBreak"
-                id="mondayBreak"
-                class="col-start-4 px-4"
-                v-model="form.monday.break"
+                :name="day + 'Break'"
+                :id="day + 'Break'"
+                class="px-4"
+                v-model="form[day].break"
             />
             <input
                 type="text"
-                class="px-4 text-center placeholder:text-center"
-                name="mondayBreakDuration"
-                id="mondayBreakDuration"
+                :name="day + 'BreakDuration'"
+                :id="day + 'BreakDuration'"
                 placeholder="minutes"
-                v-model="form.monday.breakDuration"
+                class="text-center"
+                v-model="form[day].breakDuration"
             />
-            <div class="row-start-3">Tuesday</div>
-            <div class="row-start-4">Wednesday</div>
-            <div class="row-start-5">Thursday</div>
-            <div class="row-start-6">Friday</div>
-            <div class="row-start-7">Saturday</div>
-            <div class="row-start-8">Sunday</div>
         </div>
+        <Button class="mt-2 cursor-pointer" type="submit">Update</Button>
     </form>
 </template>
-
-<style scoped></style>

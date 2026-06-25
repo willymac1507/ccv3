@@ -21,6 +21,7 @@ Route::middleware(['auth', 'role:Student'])->group(function () {
 
 Route::middleware(['auth', 'role:Student'])->group(function () {
     Route::get('settings/shifts', [ShiftController::class, 'index'])->name('shifts.index');
+    Route::patch('settings/shifts', [ShiftController::class, 'update'])->name('shifts.update');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
