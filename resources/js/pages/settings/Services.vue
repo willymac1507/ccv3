@@ -6,9 +6,17 @@ import { computed } from 'vue';
 import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 
-const page = usePage();
-const { services: allServices } = page.props;
-const { services: userServices } = page.props.auth.user;
+interface Page {
+    props: {
+        services: Array<any>;
+        auth: {
+            services: Array<any>;
+        };
+    };
+}
+const page: Page = usePage();
+const allServices = page.props.services;
+const userServices = page.props.auth.services;
 const servicesOffered: ComputedRef = computed(() => userServices);
 const servicesOfferedIds: ComputedRef = computed(() =>
     servicesOffered.value.map((service: { id: any }) => service.id),
@@ -51,7 +59,7 @@ const form = ref(
                         type="checkbox"
                         :value="service.id"
                         v-model="form.selectedServices"
-                        class="checkbox ml-auto border border-gray-500 checked:border-gray-300 checkbox-sm"
+                        class="checkbox ml-auto border border-gray-500 checkbox-sm checked:border-gray-300"
                         :id="'service' + service.id"
                         name="form.selectedServices[]"
                     />

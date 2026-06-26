@@ -80,9 +80,9 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
-                'user' => $request->user() ? $request->user()->only('id', 'name', 'roles', 'services', 'shifts') : null,
+                'user' => $request->user() ? $request->user()->only('id', 'name', 'roles') : null,
                 'services' => $request->user() ? $request->user()->services : null,
-                'shifts' => $request->user() ? $request->user()->shifts : null,
+                'shifts' => $request->user() ? $request->user()->shifts()->orderBy('dayNumber', 'asc')->get() : null,
             ],
             'services' => Service::all(),
             'slots' => [],

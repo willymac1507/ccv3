@@ -19,21 +19,21 @@ class StudentSeeder extends Seeder
                 ->each(function ($user) use ($organisation) {
                     $user->assignRole('Student');
                     $user->organisation()->associate($organisation)->save();
-                    Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => $user->id, 'day' => 'monday']);
-                    Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => $user->id, 'day' => 'tuesday']);
-                    Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => $user->id, 'day' => 'wednesday']);
-                    Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => $user->id, 'day' => 'Thursday']);
-                    Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => $user->id, 'day' => 'friday']);
-                    Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => $user->id, 'day' => 'saturday']);
-                    Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => $user->id, 'day' => 'sunday']);
+                    Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => $user->id, 'day' => 'monday', 'dayNumber' => 1]);
+                    Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => $user->id, 'day' => 'tuesday', 'dayNumber' => 2]);
+                    Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => $user->id, 'day' => 'wednesday', 'dayNumber' => 3]);
+                    Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => $user->id, 'day' => 'Thursday', 'dayNumber' => 4]);
+                    Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => $user->id, 'day' => 'friday', 'dayNumber' => 5]);
+                    Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => $user->id, 'day' => 'saturday', 'dayNumber' => 6]);
+                    Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => $user->id, 'day' => 'sunday', 'dayNumber' => 7]);
                 });
         }
-        Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => 9999, 'day' => 'monday']);
-        Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => 9999, 'day' => 'tuesday']);
-        Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => 9999, 'day' => 'wednesday']);
-        Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => 9999, 'day' => 'Thursday']);
-        Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => 9999, 'day' => 'friday']);
-        Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => 9999, 'day' => 'saturday']);
-        Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => 9999, 'day' => 'sunday']);
+        Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => 9999, 'day' => 'monday', 'dayNumber' => 1]);
+        Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => 9999, 'day' => 'tuesday', 'dayNumber' => 2]);
+        Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => 9999, 'day' => 'wednesday', 'dayNumber' => 3]);
+        Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => 9999, 'day' => 'Thursday', 'dayNumber' => 4]);
+        Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => 9999, 'day' => 'friday', 'dayNumber' => 5]);
+        Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => 9999, 'day' => 'saturday', 'dayNumber' => 6]);
+        Shift::create(['uuid' => Str::uuid()->toString(), 'user_id' => 9999, 'day' => 'sunday', 'dayNumber' => 7]);
     }
 }

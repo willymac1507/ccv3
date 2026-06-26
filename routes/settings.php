@@ -5,6 +5,7 @@ use App\Http\Controllers\Settings\SecurityController;
 use App\Http\Controllers\Settings\ServiceController;
 use App\Http\Controllers\Settings\ShiftController;
 use Illuminate\Auth\Middleware\RequirePassword;
+use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
@@ -19,7 +20,7 @@ Route::middleware(['auth', 'role:Student'])->group(function () {
     Route::patch('settings/services', [ServiceController::class, 'update'])->name('services.update');
 });
 
-Route::middleware(['auth', 'role:Student'])->group(function () {
+Route::middleware(['auth', 'role:Student', HandlePrecognitiveRequests::class])->group(function () {
     Route::get('settings/shifts', [ShiftController::class, 'index'])->name('shifts.index');
     Route::patch('settings/shifts', [ShiftController::class, 'update'])->name('shifts.update');
 });

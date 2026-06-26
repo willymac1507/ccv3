@@ -1,13 +1,50 @@
-<script setup lang="ts">
-import { Head, useForm, usePage } from '@inertiajs/vue3';
+<script lang="ts" setup>
+import { Head, usePage, useForm } from '@inertiajs/vue3';
+import { split } from 'es-toolkit/compat';
 import type { ComputedRef } from 'vue';
 import { capitalize } from 'vue';
 import { computed, ref } from 'vue';
 import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 
-const page = usePage();
-const studentShifts: ComputedRef = computed(() => page.props.auth.user.shifts);
+interface Page {
+    props: {
+        errors: object;
+        auth: {
+            shifts: Array<any>;
+        };
+    };
+}
+
+interface errors {
+    monday: {
+        breakDuration: string;
+    };
+    tuesday: {
+        breakDuration: string;
+    };
+    wednesday: {
+        breakDuration: string;
+    };
+    thursday: {
+        breakDuration: string;
+    };
+    friday: {
+        breakDuration: string;
+    };
+    saturday: {
+        breakDuration: string;
+    };
+    sunday: {
+        breakDuration: string;
+    };
+
+    [key: string]: object;
+}
+
+const page: Page = usePage();
+const errors: ComputedRef | errors = computed(() => page.props.errors);
+const studentShifts: ComputedRef = computed(() => page.props.auth.shifts);
 const currentShifts = ref(studentShifts.value.map(makeArray));
 
 function makeArray(shift: any) {
@@ -15,6 +52,7 @@ function makeArray(shift: any) {
         shift.day,
         {
             uuid: shift.uuid,
+            dayNumber: shift.dayNumber,
             start: shift.startTime,
             end: shift.endTime,
             break: shift.breakTime,
@@ -33,77 +71,83 @@ const days: Array<string> = [
     'sunday',
 ];
 
+interface shiftFormObject {
+    [key: string]: string;
+}
+
 interface Form {
-    [key: string]: object;
     monday: {
-        [key: string]: string;
         uuid: string;
         day: string;
+        dayNumber: string;
         start: string;
         end: string;
         break: string;
         breakDuration: string;
     };
     tuesday: {
-        [key: string]: string;
         uuid: string;
         day: string;
+        dayNumber: string;
         start: string;
         end: string;
         break: string;
         breakDuration: string;
     };
     wednesday: {
-        [key: string]: string;
         uuid: string;
         day: string;
+        dayNumber: string;
         start: string;
         end: string;
         break: string;
         breakDuration: string;
     };
     thursday: {
-        [key: string]: string;
         uuid: string;
         day: string;
+        dayNumber: string;
         start: string;
         end: string;
         break: string;
         breakDuration: string;
     };
     friday: {
-        [key: string]: string;
         uuid: string;
         day: string;
+        dayNumber: string;
         start: string;
         end: string;
         break: string;
         breakDuration: string;
     };
     saturday: {
-        [key: string]: string;
         uuid: string;
         day: string;
+        dayNumber: string;
         start: string;
         end: string;
         break: string;
         breakDuration: string;
     };
     sunday: {
-        [key: string]: string;
         uuid: string;
         day: string;
+        dayNumber: string;
         start: string;
         end: string;
         break: string;
         breakDuration: string;
     };
+
+    [key: string]: shiftFormObject;
 }
 
 const form = ref(
-    useForm<Form>({
+    useForm<Form>('patch', '/settings/shifts', {
         monday: {
             day: currentShifts.value[0][0],
+            dayNumber: currentShifts.value[0][1].dayNumber,
             uuid: currentShifts.value[0][1].uuid,
             start: currentShifts.value[0][1].start,
             end: currentShifts.value[0][1].end,
@@ -112,6 +156,7 @@ const form = ref(
         },
         tuesday: {
             day: currentShifts.value[1][0],
+            dayNumber: currentShifts.value[1][1].dayNumber,
             uuid: currentShifts.value[1][1].uuid,
             start: currentShifts.value[1][1].start,
             end: currentShifts.value[1][1].end,
@@ -120,6 +165,7 @@ const form = ref(
         },
         wednesday: {
             day: currentShifts.value[2][0],
+            dayNumber: currentShifts.value[2][1].dayNumber,
             uuid: currentShifts.value[2][1].uuid,
             start: currentShifts.value[2][1].start,
             end: currentShifts.value[2][1].end,
@@ -128,6 +174,7 @@ const form = ref(
         },
         thursday: {
             day: currentShifts.value[3][0],
+            dayNumber: currentShifts.value[3][1].dayNumber,
             uuid: currentShifts.value[3][1].uuid,
             start: currentShifts.value[3][1].start,
             end: currentShifts.value[3][1].end,
@@ -136,6 +183,7 @@ const form = ref(
         },
         friday: {
             day: currentShifts.value[4][0],
+            dayNumber: currentShifts.value[4][1].dayNumber,
             uuid: currentShifts.value[4][1].uuid,
             start: currentShifts.value[4][1].start,
             end: currentShifts.value[4][1].end,
@@ -144,6 +192,7 @@ const form = ref(
         },
         saturday: {
             day: currentShifts.value[5][0],
+            dayNumber: currentShifts.value[5][1].dayNumber,
             uuid: currentShifts.value[5][1].uuid,
             start: currentShifts.value[5][1].start,
             end: currentShifts.value[5][1].end,
@@ -152,6 +201,7 @@ const form = ref(
         },
         sunday: {
             day: currentShifts.value[6][0],
+            dayNumber: currentShifts.value[6][1].dayNumber,
             uuid: currentShifts.value[6][1].uuid,
             start: currentShifts.value[6][1].start,
             end: currentShifts.value[6][1].end,
@@ -161,10 +211,7 @@ const form = ref(
     }),
 );
 
-for (const day of days) {
-    console.log(day);
-    console.log(form.value[day]);
-}
+const submit = () => form.value.submit();
 </script>
 
 <template>
@@ -174,12 +221,12 @@ for (const day of days) {
 
     <div class="flex flex-col space-y-6">
         <Heading
-            variant="small"
-            title="Availability"
             description="Select the shifts you are working"
+            title="Availability"
+            variant="small"
         />
     </div>
-    <form @submit.prevent="form.patch('/settings/shifts')" class="space-y-6">
+    <form class="space-y-6" @submit.prevent="submit">
         <div class="grid grid-cols-5 text-sm">
             <div class="col-start-2 px-4 text-left">Start</div>
             <div class="px-4 text-left">End</div>
@@ -188,36 +235,51 @@ for (const day of days) {
         </div>
         <div v-for="day in days" :key="day" class="grid grid-cols-5 text-sm">
             <div>{{ capitalize(day) }}</div>
+            <label :for="day + 'Start'">
+                <input
+                    :id="day + 'Start'"
+                    v-model="form[day].start"
+                    :name="day + 'Start'"
+                    class="col-start-2 px-4"
+                    type="time"
+                />
+            </label>
+
             <input
-                type="time"
-                :name="day + 'Start'"
-                :id="day + 'Start'"
-                class="col-start-2 px-4"
-                v-model="form[day].start"
-            />
-            <input
-                type="time"
-                :name="day + 'End'"
                 :id="day + 'End'"
-                class="px-4"
                 v-model="form[day].end"
-            />
-            <input
-                type="time"
-                :name="day + 'Break'"
-                :id="day + 'Break'"
+                :name="day + 'End'"
                 class="px-4"
-                v-model="form[day].break"
+                type="time"
             />
             <input
-                type="text"
-                :name="day + 'BreakDuration'"
+                :id="day + 'Break'"
+                v-model="form[day].break"
+                :name="day + 'Break'"
+                class="px-4"
+                type="time"
+            />
+            <input
                 :id="day + 'BreakDuration'"
-                placeholder="minutes"
-                class="text-center"
                 v-model="form[day].breakDuration"
+                :name="day + 'BreakDuration'"
+                class="text-center"
+                placeholder="minutes"
+                type="text"
             />
         </div>
         <Button class="mt-2 cursor-pointer" type="submit">Update</Button>
     </form>
+    <div class="toast">
+        <div
+            v-for="(message, field) in errors"
+            v-bind:key="field"
+            class="alert alert-error"
+        >
+            <span
+                >{{ capitalize(split(field.toString(), '.')[0]) }}:
+                {{ message }}</span
+            >
+        </div>
+    </div>
 </template>
