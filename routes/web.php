@@ -1,8 +1,8 @@
 <?php
 
+use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrganisationController;
-use App\Http\Controllers\Settings\ServiceController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
@@ -11,8 +11,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index',
         'logo' => asset('storage/images/logo.webp'),
     ])->name('dashboard');
-
 });
+
+Route::middleware(['auth', 'role:Student'])->group(function () {
+    Route::get('appointments', [AppointmentController::class, 'index'])->name('appointments.index');
+});
+Route::get('appointments/search', [AppointmentController::class, 'search'])->name('appointments.search');
 
 Route::middleware(['role:Super Admin'])->group(function () {
     Route::get('admin/super/organisations', [OrganisationController::class, 'index'])

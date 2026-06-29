@@ -2,9 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
-use App\Models\Service;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -27,6 +27,30 @@ class HandleInertiaRequests extends Middleware
         return parent::version($request);
     }
 
+    /**
+     * Define the props that are shared by default.
+     *
+     * @see https://inertiajs.com/shared-data
+     *
+     * @return array<string, mixed>
+     */
+    public function share(Request $request): array
+    {
+        return [
+            ...parent::share($request),
+            'name' => config('app.name'),
+            'auth' => [
+                'user' => $request->user() ? $request->user()->only('id', 'name', 'roles') : null,
+                'services' => $request->user() ? $request->user()->services : null,
+                'shifts' => $request->user() ? $request->user()->shifts()->orderBy('dayNumber', 'asc')->get() : null,
+            ],
+            'services' => Service::all(),
+            'slots' => [],
+            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'mainNavItems' => $this->setNavItems($request),
+        ];
+    }
+
     public function setNavItems(Request $request): ?array
     {
         $standardNavItems = [
@@ -37,7 +61,7 @@ class HandleInertiaRequests extends Middleware
             ],
             [
                 'title' => 'Appointments',
-                'href' => '#',
+                'href' => '/appointments/search',
                 'icon' => 'fa-solid fa-calendar-days',
             ],
             [
@@ -65,29 +89,5 @@ class HandleInertiaRequests extends Middleware
         }
 
         return null;
-    }
-
-    /**
-     * Define the props that are shared by default.
-     *
-     * @see https://inertiajs.com/shared-data
-     *
-     * @return array<string, mixed>
-     */
-    public function share(Request $request): array
-    {
-        return [
-            ...parent::share($request),
-            'name' => config('app.name'),
-            'auth' => [
-                'user' => $request->user() ? $request->user()->only('id', 'name', 'roles') : null,
-                'services' => $request->user() ? $request->user()->services : null,
-                'shifts' => $request->user() ? $request->user()->shifts()->orderBy('dayNumber', 'asc')->get() : null,
-            ],
-            'services' => Service::all(),
-            'slots' => [],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
-            'mainNavItems' => $this->setNavItems($request),
-        ];
     }
 }

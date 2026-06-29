@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Organisation extends Model
 {
@@ -14,5 +15,10 @@ class Organisation extends Model
     public function students(): HasMany
     {
         return $this->hasMany(User::class);
+    }
+
+    public function appointments(): HasManyThrough
+    {
+        return $this->hasManyThrough(Appointment::class, User::class);
     }
 }

@@ -31,3 +31,10 @@ declare module 'vue' {
         $headManager: ReturnType<typeof createHeadManager>;
     }
 }
+
+declare module 'postcodesio-client' {
+    export default class PostcodesIO {
+        constructor(apiKey: string);
+        lookup(postcode: string): Promise<any>;
+    }
+}
