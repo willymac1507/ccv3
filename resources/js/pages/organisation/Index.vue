@@ -9,6 +9,8 @@ interface Organisation {
     postcode: string;
     admin_name: string;
     email: string;
+    lat: string;
+    lng: string;
 }
 interface Props {
     name: string;
