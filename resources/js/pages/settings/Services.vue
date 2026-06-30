@@ -1,10 +1,11 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { Head, useForm, usePage } from '@inertiajs/vue3';
 import type { ComputedRef } from 'vue';
 import { ref } from 'vue';
 import { computed } from 'vue';
 import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
+import { edit } from '@/routes/services';
 
 interface Page {
     props: {
@@ -14,6 +15,18 @@ interface Page {
         };
     };
 }
+
+defineOptions({
+    layout: {
+        breadcrumbs: [
+            {
+                title: 'Services offered',
+                href: edit(),
+            },
+        ],
+    },
+});
+
 const page: Page = usePage();
 const allServices = page.props.services;
 const userServices = page.props.auth.services;
@@ -38,30 +51,30 @@ const form = ref(
 
     <div class="flex flex-col space-y-6">
         <Heading
-            variant="small"
-            title="Services"
             description="Select which services you offer"
+            title="Services"
+            variant="small"
         />
 
         <form
-            @submit.prevent="form.patch('/settings/services')"
             class="space-y-6"
+            @submit.prevent="form.patch('/settings/services')"
         >
             <div class="flex w-1/2 flex-col gap-2">
                 <label
-                    class="label"
-                    :for="'service' + service.id"
                     v-for="service in serviceList"
                     :key="service.id"
+                    :for="'service' + service.id"
+                    class="label"
                 >
                     {{ service.name }}
                     <input
-                        type="checkbox"
-                        :value="service.id"
-                        v-model="form.selectedServices"
-                        class="checkbox ml-auto border border-gray-500 checkbox-sm checked:border-gray-300"
                         :id="'service' + service.id"
+                        v-model="form.selectedServices"
+                        :value="service.id"
+                        class="checkbox ml-auto border border-gray-500 checkbox-sm checked:border-gray-300"
                         name="form.selectedServices[]"
+                        type="checkbox"
                     />
                 </label>
             </div>

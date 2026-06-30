@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Appointment;
 use App\Models\Organisation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Random\RandomException;
 
 class AppointmentController extends Controller
 {
@@ -19,10 +21,13 @@ class AppointmentController extends Controller
 
     /**
      * Search for an appointment from one or more salons.
+     *
+     * @throws RandomException
      */
     public function search()
     {
         $organisations = Organisation::all()->select(['id', 'name', 'postcode']);
+
         return Inertia::render('appointment/Search', [
             'salons' => $organisations,
         ]);

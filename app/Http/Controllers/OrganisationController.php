@@ -17,7 +17,9 @@ class OrganisationController extends Controller
 
     public function index()
     {
-        return Inertia::render('Organisation/Index');
+        return Inertia::render('organisation/Index', [
+            'organisations' => Organisation::all(),
+        ]);
     }
 
     /**
@@ -41,7 +43,9 @@ class OrganisationController extends Controller
      */
     public function show(Organisation $organisation)
     {
-        //
+        return Inertia::render('organisation/Show', [
+            'organisation' => $organisation,
+        ]);
     }
 
     /**

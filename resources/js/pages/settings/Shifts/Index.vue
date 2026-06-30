@@ -6,6 +6,7 @@ import { capitalize } from 'vue';
 import { computed, ref } from 'vue';
 import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
+import { index } from '@/routes/shifts';
 
 interface Page {
     props: {
@@ -41,6 +42,17 @@ interface errors {
 
     [key: string]: object;
 }
+
+defineOptions({
+    layout: {
+        breadcrumbs: [
+            {
+                title: 'Availability',
+                href: index(),
+            },
+        ],
+    },
+});
 
 const page: Page = usePage();
 const errors: ComputedRef | errors = computed(() => page.props.errors);

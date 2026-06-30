@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -23,6 +22,8 @@ return new class extends Migration
             $table->string('city');
             $table->string('county')->comment('State, Province, County, etc.');
             $table->string('postcode')->comment('Postal code or ZIP code');
+            $table->string('lat')->nullable();
+            $table->string('lng')->nullable();
             $table->string('country')->default('United Kingdom');
             $table->string('logo')->nullable();
         });
