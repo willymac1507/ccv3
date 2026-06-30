@@ -49,7 +49,7 @@ console.log(props.salons);
                 variant="small"
             />
             <form action="" class="grid items-center space-y-6 px-6">
-                <label for="salons">
+                <label class="label w-1/2" for="salons">
                     <multiselect
                         id="salons"
                         v-model="salonsSelected"
