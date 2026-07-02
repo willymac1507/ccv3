@@ -25,7 +25,9 @@ defineOptions({
     },
 });
 
-const appointments: ComputedRef<any[] | undefined> = computed(() => props.appointmentsAsStudent);
+const appointments: ComputedRef<any[] | undefined> = computed(
+    () => props.appointmentsAsStudent,
+);
 console.log(props.appointmentsAsStudent);
 provide('appointments', appointments);
 </script>
@@ -56,7 +58,7 @@ provide('appointments', appointments);
         <div
             class="relative min-h-screen flex-1 rounded-xl border border-sidebar-border/70 p-6 md:min-h-min dark:border-sidebar-border"
         >
-            <DashMainSection :date='date' />
+            <DashMainSection :date="date" />
         </div>
     </div>
 </template>

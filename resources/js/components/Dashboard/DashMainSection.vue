@@ -1,6 +1,5 @@
 <script setup lang="ts">
-
-import type { Ref} from 'vue';
+import type { Ref } from 'vue';
 import { inject, ref } from 'vue';
 import DashAppointments from '@/components/Dashboard/DashAppointments.vue';
 import DashCalendar from '@/components/Dashboard/DashCalendar.vue';
@@ -14,7 +13,6 @@ const meetings: Array<any> | undefined = inject('appointments');
 const props = defineProps<Props>();
 
 const parentDate: Ref = ref(new Date(props.date));
-
 </script>
 
 <template>

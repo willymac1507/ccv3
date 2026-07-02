@@ -7,6 +7,7 @@ use App\Models\Organisation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use JetBrains\PhpStorm\NoReturn;
 use Random\RandomException;
 
 class AppointmentController extends Controller
@@ -24,13 +25,17 @@ class AppointmentController extends Controller
      *
      * @throws RandomException
      */
-    public function search()
+    #[NoReturn]
+    public function search(Request $request)
     {
-        $organisations = Organisation::all()->select(['id', 'name', 'postcode']);
+        $salonIds = array_column($request->salons, 'id');
+        $salons = Organisation::query()
+            ->whereIn('id', $salonIds)
+            ->with('students')
+            ->with('students.services')
+            ->get();
 
-        return Inertia::render('appointment/Search', [
-            'salons' => $organisations,
-        ]);
+        return Inertia::render('appointment/Search', ['salons' => $salons]);
     }
 
     /**

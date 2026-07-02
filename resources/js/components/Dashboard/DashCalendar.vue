@@ -127,7 +127,11 @@ function goToToday() {
                 <ChevronRightIcon class="size-5" aria-hidden="true" />
             </button>
         </div>
-        <div class="flex w-full items-center mt-4"><button class="btn btn-primary mx-auto" @click="goToToday">Today</button></div>
+        <div class="mt-4 flex w-full items-center">
+            <button class="btn mx-auto btn-primary" @click="goToToday">
+                Today
+            </button>
+        </div>
         <div
             class="mt-6 grid grid-cols-7 text-xs/6 text-gray-500 dark:text-gray-400"
         >

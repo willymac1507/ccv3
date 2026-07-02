@@ -4,17 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Organisation;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Attributes\Controllers\Middleware;
-use Illuminate\Routing\Attributes\Controllers\Authorize;
 use Inertia\Inertia;
-use Spatie\Permission\Middleware\RoleMiddleware;
 
 class OrganisationController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-
     public function index()
     {
         return Inertia::render('organisation/Index', [
@@ -70,5 +66,14 @@ class OrganisationController extends Controller
     public function destroy(Organisation $organisation)
     {
         //
+    }
+
+    public function search()
+    {
+        $organisations = Organisation::all()->select(['id', 'name', 'postcode', 'lat', 'lng']);
+
+        return Inertia::render('organisation/Search', [
+            'salons' => $organisations,
+        ]);
     }
 }

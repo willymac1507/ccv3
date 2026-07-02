@@ -7,7 +7,7 @@ import {
 } from '@heroicons/vue/20/solid';
 import { router } from '@inertiajs/vue3';
 import { format } from 'date-fns';
-import type { ModelRef} from 'vue';
+import type { ModelRef } from 'vue';
 import { watch } from 'vue';
 
 interface Props {

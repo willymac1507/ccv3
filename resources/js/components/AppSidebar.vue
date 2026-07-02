@@ -15,7 +15,6 @@ import {
 import { dashboard } from '@/routes';
 
 const mainNavItems: any = usePage().props.mainNavItems;
-
 </script>
 
 <template>

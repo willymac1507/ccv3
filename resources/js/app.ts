@@ -1,6 +1,11 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
-import {faBuilding, faTachographDigital, faEnvelope, faCalendarDays } from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {
+    faBuilding,
+    faTachographDigital,
+    faEnvelope,
+    faCalendarDays,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { initializeTheme } from '@/composables/useAppearance';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -29,9 +34,9 @@ createInertiaApp({
         color: '#4B5563',
     },
     withApp(app) {
-        app.component('font-awesome-icon', FontAwesomeIcon)
-    }
-}).then(r => console.log(r));
+        app.component('font-awesome-icon', FontAwesomeIcon);
+    },
+}).then((r) => console.log(r));
 
 // This will set light / dark mode on page load...
 initializeTheme();

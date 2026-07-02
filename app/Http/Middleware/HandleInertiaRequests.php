@@ -61,7 +61,7 @@ class HandleInertiaRequests extends Middleware
             ],
             [
                 'title' => 'Appointments',
-                'href' => '/appointments/search',
+                'href' => '/organisations/search',
                 'icon' => 'fa-solid fa-calendar-days',
             ],
             [

@@ -20,7 +20,7 @@ const sidebarNavItems: NavItem[] = [
     {
         title: 'Availability',
         href: indexShifts(),
-        gate: 'Student'
+        gate: 'Student',
     },
     {
         title: 'Services',
@@ -43,7 +43,6 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
 
 const rolesRaw: any = usePage().props.auth.user.roles;
 const roles: Array<string> = rolesRaw.map((role: any) => role.name);
-
 </script>
 
 <template>

@@ -48,7 +48,6 @@ const activeItemStyles =
     'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
 const mainNavItems: any = usePage().props.mainNavItems;
-
 </script>
 
 <template>
