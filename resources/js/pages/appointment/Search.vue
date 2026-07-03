@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import { Head } from '@inertiajs/vue3';
+import { getDate, getDay } from 'date-fns';
+import { computed, ref, watch } from 'vue';
 import DatePicker from '@/components/DatePicker.vue';
 import Heading from '@/components/Heading.vue';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
@@ -17,7 +18,47 @@ interface Props {
     salons: Array<any>;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
+
+console.log(
+    props.salons[0].students.filter(
+        (student) => student.shifts[0].startTime !== null,
+    ),
+);
+
+const selectedDate = ref();
+const selectedDay = computed(() => {
+    if (getDay(selectedDate.value) === 0) {
+        return 7;
+    } else {
+        return getDay(selectedDate.value);
+    }
+});
+
+// const filteredStudents = computed(() => {
+//     if (selectedDay.value) {
+//         return props.salons[0].students.filter(
+//             (student) =>
+//                 student.shifts[selectedDay.value - 1].startTime !== null,
+//         );
+//     } else {
+//         return null;
+//     }
+// });
+
+const filteredSalons = computed(() => {
+    if (selectedDay.value) {
+        return props.salons.map((salon) => ({
+            ...salon,
+            students: salon.students.filter(
+                (student) =>
+                    student.shifts[selectedDay.value - 1].startTime !== null,
+            ),
+        }));
+    } else {
+        return null;
+    }
+});
 </script>
 
 <template>
@@ -46,12 +87,12 @@ defineProps<Props>();
                                 </div>
                             </CardDescription>
                         </div>
-                        <DatePicker />
+                        <DatePicker v-model="selectedDate" />
                     </div>
                 </CardHeader>
-                <CardContent>
-                    <div class="flex flex-col">
-                        <p class="mb-2 font-bold">Students</p>
+                <CardContent v-if="selectedDate">
+                    <div v-if="salon.students.length" class="flex flex-col">
+                        <p class="mb-2 font-bold">Available Students</p>
                         <table class="border-spacing-2">
                             <tr>
                                 <td>Student</td>
@@ -73,8 +114,12 @@ defineProps<Props>();
                             </tr>
                         </table>
                     </div>
+                    <div v-if="!salon.students.length">
+                        <p class="mb-2 font-bold">
+                            Sorry, no students are available on that day.
+                        </p>
+                    </div>
                 </CardContent>
-                <CardFooter> Footer</CardFooter>
             </Card>
         </div>
     </div>

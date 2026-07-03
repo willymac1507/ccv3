@@ -33,6 +33,7 @@ class AppointmentController extends Controller
             ->whereIn('id', $salonIds)
             ->with('students')
             ->with('students.services')
+            ->with('students.shifts')
             ->get();
 
         return Inertia::render('appointment/Search', ['salons' => $salons]);
