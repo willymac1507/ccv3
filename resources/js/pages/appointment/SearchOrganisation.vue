@@ -42,7 +42,7 @@ async function geocode(
 }
 
 function selectSalon(id: number) {
-    router.get('/organisations/' + id + '/available-students');
+    router.get('/organisations/' + id + '/appointments/search');
     // if (salonsSelected.value.find((salon) => salon.id === id)) {
     //     const indexToDelete = salonsSelected.value.findIndex(
     //         (salon) => salon.id === id,

@@ -5,10 +5,11 @@ import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
 import { bunny } from 'laravel-vite-plugin/fonts';
 import { defineConfig } from 'vite';
+import vueDevTools from 'vite-plugin-vue-devtools';
 
 export default defineConfig({
     ssr: {
-        noExternal: ['@fortawesome/vue-fontawesome']
+        noExternal: ['@fortawesome/vue-fontawesome'],
     },
     plugins: [
         laravel({
@@ -30,6 +31,7 @@ export default defineConfig({
                 },
             },
         }),
+        vueDevTools(),
         wayfinder({
             formVariants: true,
         }),

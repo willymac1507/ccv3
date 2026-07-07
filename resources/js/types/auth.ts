@@ -13,6 +13,20 @@ export type Auth = {
     user: User;
 };
 
+export type SafeUser = Omit<
+    User,
+    'email' | 'avatar' | 'email_verified_at' | 'created_at' | 'updated_at'
+>;
+
+export type Roles = {
+    id: number;
+    name: string;
+    guard_name: string;
+    created_at: string;
+    updated_at: string;
+};
+export type UserWithRoles = SafeUser & { roles: Array<any> };
+
 /* @chisel-passkeys */
 export type Passkey = {
     id: number;

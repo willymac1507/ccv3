@@ -2,12 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Concerns\Organisations;
+use App\Concerns\Students;
 use App\Models\Organisation;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class OrganisationController extends Controller
 {
+    use Organisations;
+    use Students;
+
     /**
      * Display a listing of the resource.
      */
@@ -70,10 +76,22 @@ class OrganisationController extends Controller
 
     public function search()
     {
-        $organisations = Organisation::all()->select(['id', 'name', 'postcode', 'lat', 'lng']);
+        $organisations = $this->getAllOrganisations()->select(['id', 'name', 'postcode', 'lat', 'lng']);
 
         return Inertia::render('organisation/Search', [
             'salons' => $organisations,
         ]);
+    }
+
+    public function availableStudents(Organisation $organisation)
+    {
+        return Inertia::render('organisation/SearchStudents', ['salon' => $organisation]);
+    }
+
+    public function getAvailableStudents(Organisation $organisation, Request $request)
+    {
+        return $organisation->students()
+            ->with(['shifts', 'services'])
+            ->get();
     }
 }

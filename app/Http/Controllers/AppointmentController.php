@@ -2,22 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Concerns\Organisations;
 use App\Models\Appointment;
 use App\Models\Organisation;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
-use JetBrains\PhpStorm\NoReturn;
 use Random\RandomException;
 
 class AppointmentController extends Controller
 {
+    use Organisations;
+
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(User $user)
     {
-        //
+        $student = User::with(['organisation'])->find($user->id);
+
+        return Inertia::render('appointment/Index');
     }
 
     /**
@@ -25,18 +29,11 @@ class AppointmentController extends Controller
      *
      * @throws RandomException
      */
-    #[NoReturn]
-    public function search(Request $request)
+    public function searchStudents(Organisation $organisation)
     {
-        $salonIds = array_column($request->salons, 'id');
-        $salons = Organisation::query()
-            ->whereIn('id', $salonIds)
-            ->with('students')
-            ->with('students.services')
-            ->with('students.shifts')
-            ->get();
+        $salon = $this->getOrganisationWithStudents($organisation->id);
 
-        return Inertia::render('appointment/Search', ['salons' => $salons]);
+        return Inertia::render('appointment/SearchStudents', ['salon' => $salon]);
     }
 
     /**

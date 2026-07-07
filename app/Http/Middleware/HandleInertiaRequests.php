@@ -60,11 +60,6 @@ class HandleInertiaRequests extends Middleware
                 'icon' => 'fa-solid fa-tachograph-digital',
             ],
             [
-                'title' => 'Appointments',
-                'href' => '/organisations/search',
-                'icon' => 'fa-solid fa-calendar-days',
-            ],
-            [
                 'title' => 'Messages',
                 'href' => '#',
                 'icon' => 'fa-solid fa-envelope',

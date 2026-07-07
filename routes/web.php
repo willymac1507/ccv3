@@ -19,7 +19,9 @@ Route::middleware(['auth', 'role:Student'])->group(function () {
 
 Route::middleware(['auth', 'role:Client'])->group(function () {
     Route::get('organisations/search', [OrganisationController::class, 'search'])->name('organisations.search');
-    Route::post('appointments/search', [AppointmentController::class, 'search'])->name('appointments.search');
+    Route::get('organisations/{organisation:id}/available-students', [OrganisationController::class, 'availableStudents'])->name('organisation.availableStudents');
+    Route::get('students/{user:id}/appointments', [AppointmentController::class, 'index'])->name('students.appointments.index');
+    Route::get('api/organisations/{organisation:id}/students/available', [OrganisationController::class, 'getAvailableStudents'])->name('api.students.available');
 });
 
 Route::middleware(['role:Super Admin'])->group(function () {
@@ -28,4 +30,4 @@ Route::middleware(['role:Super Admin'])->group(function () {
     Route::get('admin/super/organisation/{organisation:id}/show', [OrganisationController::class, 'show'])->name('admin.super.organisation.show');
 });
 
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';

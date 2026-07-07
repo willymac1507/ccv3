@@ -33,7 +33,8 @@ createInertiaApp({
     progress: {
         color: '#4B5563',
     },
-    withApp(app) {
+    withApp: function (app) {
+        // @ts-expect-error - below code is too complex to expand
         app.component('font-awesome-icon', FontAwesomeIcon);
     },
 }).then((r) => console.log(r));
