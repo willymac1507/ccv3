@@ -1,74 +1,36 @@
 <script lang="ts" setup>
 import { Head, usePage } from '@inertiajs/vue3';
-import {
-    add,
-    differenceInHours,
-    format,
-    getHours,
-    getMinutes,
-    parse,
-    roundToNearestHours,
-} from 'date-fns';
+import { format, getHours, parse, roundToNearestHours } from 'date-fns';
 import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
 import Heading from '@/components/Heading.vue';
 import { index } from '@/routes/appointments';
 import organisations from '@/routes/organisations';
-interface Props {
-    student: {
-        id: number;
-        name: string;
-        organisation_id: number;
-    };
-    appointments: Array<any>;
-}
-
-interface PageProps {
-    props: {
-        date: Date;
-        shift: {
-            startTime: string;
-            endTime: string;
-            breakTime: string;
-            id: number;
-            user_id: number;
-            day: string;
-            duration: number;
-        };
-    };
-}
+import type { Props, PageProps } from '@/types/appointments';
 
 const page: PageProps = usePage();
 
-const selectedDate: Date = page.props.date.toString().split('T')[0];
-const shift = reactive(page.props.shift);
+const selectedDate: Date = page.props.date;
+const { startTime, endTime, breakTime, duration } = reactive(page.props.shift);
 
 // TODO - make this less hacky
-const shiftStart = parseDate(shift.startTime.toString());
-const shiftEnd = parseDate(shift.endTime.toString());
-const shiftBreak = parseDate(shift.breakTime.toString()) ?? null;
-const shiftBreakEnd = add(shiftBreak, { minutes: shift.duration }) ?? null;
 
-const calendarStart = roundToNearestHours(shiftStart, {
-    roundingMethod: 'floor',
-});
-const calendarEnd = roundToNearestHours(shiftEnd, { roundingMethod: 'ceil' });
+const calendarStart = getHours(parseAndRound(startTime, 'floor'));
+const calendarEnd = getHours(parseAndRound(endTime, 'ceil'));
+const shiftStart = rowForTime(startTime);
+const shiftEnd = rowForTime(endTime);
+const showEndOffset =
+    parseAndRound(endTime, 'ceil') === parse(endTime, 'HH:mm:ss', new Date());
 
-const calendarLength = differenceInHours(calendarEnd, calendarStart);
-console.log(getMinutes(shiftStart) === getMinutes(calendarStart));
-function parseDate(time: string) {
-    return parse(selectedDate + ' ' + time, 'yyyy-MM-dd HH:mm:ss', new Date());
-}
-// End of hacky code
+console.log(showEndOffset);
 
-// Try this code
 const interval = 15; // minutes
 const slots: ComputedRef = computed(() => {
     const result: Array<any> = [];
 
     for (
-        let mins = getHours(calendarStart) * 60;
-        mins < getHours(calendarEnd) * 60;
+        let mins = calendarStart * 60;
+        mins < calendarEnd * 60;
         mins += interval
     ) {
         result.push(
@@ -79,18 +41,26 @@ const slots: ComputedRef = computed(() => {
     return result;
 });
 
+const startOffsetStyle = computed(() => ({
+    gridRow: `1 / span ${shiftStart - 1}`,
+    gridColumn: 1,
+}));
+
+const endOffsetStyle = computed(() => ({
+    gridRow: `${shiftEnd} / span ${slots.value.length - shiftEnd + 2}`,
+    gridColumn: 1,
+}));
+
+function parseAndRound(time: string, roundingMethod: 'floor' | 'ceil') {
+    return roundToNearestHours(parse(time, 'HH:mm:ss', new Date()), {
+        roundingMethod,
+    });
+}
 function rowForTime(time: string) {
     const [hours, minutes] = time.split(':').map(Number);
 
-    return (hours * 60 - getHours(calendarStart) * 60 + minutes) / interval + 2;
+    return ((hours - calendarStart) * 60 + minutes) / interval + 2;
 }
-
-const shiftStyle = computed(() => ({
-    gridRow: `${rowForTime(shift.startTime)} / ${rowForTime(shift.endTime)}`,
-    gridColumn: 2,
-}));
-
-// End of trial code
 
 defineProps<Props>();
 
@@ -188,8 +158,27 @@ defineOptions({
                                     :style="`grid-template-rows: 1.75rem repeat(${slots.length}, minmax(0, 1fr)) auto;`"
                                     class="col-start-1 col-end-2 row-start-1 grid grid-cols-1"
                                 >
+                                    <!-- Start of day -->
                                     <li
-                                        :style="`grid-row: ${rowForTime('10:00')} / span 12`"
+                                        :style="startOffsetStyle"
+                                        class="relative mt-px flex dark:before:pointer-events-none dark:before:absolute dark:before:inset-1 dark:before:z-0 dark:before:rounded-lg dark:before:bg-gray-900"
+                                    >
+                                        <div
+                                            class="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-blue-50 p-2 text-xs/5 hover:bg-blue-100 dark:bg-gray-600/15 dark:hover:bg-gray-600/20"
+                                        />
+                                    </li>
+                                    <!-- End of day -->
+                                    <li
+                                        :style="endOffsetStyle"
+                                        class="relative mt-px flex dark:before:pointer-events-none dark:before:absolute dark:before:inset-1 dark:before:z-0 dark:before:rounded-lg dark:before:bg-gray-900"
+                                    >
+                                        <div
+                                            class="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-blue-50 p-2 text-xs/5 hover:bg-blue-100 dark:bg-gray-600/15 dark:hover:bg-gray-600/20"
+                                        />
+                                    </li>
+                                    <!-- Appointments -->
+                                    <li
+                                        :style="`grid-row: ${rowForTime('10:00')} / span 4`"
                                         class="relative mt-px flex dark:before:pointer-events-none dark:before:absolute dark:before:inset-1 dark:before:z-0 dark:before:rounded-lg dark:before:bg-gray-900"
                                     >
                                         <a
@@ -207,63 +196,6 @@ defineOptions({
                                                 <time
                                                     datetime="2022-01-22T06:00"
                                                     >10:00 AM</time
-                                                >
-                                            </p>
-                                        </a>
-                                    </li>
-                                    <li
-                                        class="relative mt-px flex dark:before:pointer-events-none dark:before:absolute dark:before:inset-1 dark:before:z-0 dark:before:rounded-lg dark:before:bg-gray-900"
-                                        style="grid-row: 92 / span 30"
-                                    >
-                                        <a
-                                            class="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-pink-50 p-2 text-xs/5 hover:bg-pink-100 dark:bg-pink-600/15 dark:hover:bg-pink-600/20"
-                                            href="#"
-                                        >
-                                            <p
-                                                class="order-1 font-semibold text-pink-700 dark:text-pink-300"
-                                            >
-                                                Flight to Paris
-                                            </p>
-                                            <p
-                                                class="order-1 text-pink-500 group-hover:text-pink-700 dark:text-pink-400 dark:group-hover:text-pink-300"
-                                            >
-                                                John F. Kennedy International
-                                                Airport
-                                            </p>
-                                            <p
-                                                class="text-pink-500 group-hover:text-pink-700 dark:text-pink-400 dark:group-hover:text-pink-300"
-                                            >
-                                                <time
-                                                    datetime="2022-01-22T07:30"
-                                                    >7:30 AM</time
-                                                >
-                                            </p>
-                                        </a>
-                                    </li>
-                                    <li
-                                        class="relative mt-px flex dark:before:pointer-events-none dark:before:absolute dark:before:inset-1 dark:before:z-0 dark:before:rounded-lg dark:before:bg-gray-900"
-                                        style="grid-row: 134 / span 18"
-                                    >
-                                        <a
-                                            class="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-indigo-50 p-2 text-xs/5 hover:bg-indigo-100 dark:bg-indigo-600/15 dark:hover:bg-indigo-600/20"
-                                            href="#"
-                                        >
-                                            <p
-                                                class="order-1 font-semibold text-indigo-700 dark:text-indigo-300"
-                                            >
-                                                Sightseeing
-                                            </p>
-                                            <p
-                                                class="order-1 text-indigo-500 group-hover:text-indigo-700 dark:text-indigo-400 dark:group-hover:text-indigo-300"
-                                            >
-                                                Eiffel Tower
-                                            </p>
-                                            <p
-                                                class="text-indigo-500 group-hover:text-indigo-700 dark:text-indigo-400 dark:group-hover:text-indigo-300"
-                                            >
-                                                <time
-                                                    datetime="2022-01-22T11:00"
-                                                    >11:00 AM</time
                                                 >
                                             </p>
                                         </a>
