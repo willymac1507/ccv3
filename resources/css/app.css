@@ -10,10 +10,9 @@
 @plugin 'daisyui';
 
 @theme inline {
-    --font-sans:
-        Instrument Sans, ui-sans-serif, system-ui, sans-serif,
-        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
-        'Noto Color Emoji';
+    --font-sans: Instrument Sans, ui-sans-serif, system-ui, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+    'Noto Color Emoji';
 
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
@@ -84,10 +83,9 @@
 @layer utilities {
     body,
     html {
-        --font-sans:
-            'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
-            'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
-            'Noto Color Emoji';
+        --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+        'Noto Color Emoji';
     }
 }
 
@@ -168,7 +166,37 @@
     * {
         @apply border-border outline-ring/50;
     }
+
     body {
         @apply bg-background text-foreground;
     }
+}
+
+.calendar {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    grid-auto-rows: 3.5rem;
+}
+
+.time {
+    grid-column: 1;
+}
+
+.slot {
+    grid-column: 2;
+    border-top: 1px solid #eee;
+}
+
+.slot.half {
+    border-top-style: dashed;
+}
+
+.slot.hour {
+    border-top: 2px solid #999;
+}
+
+.shift {
+    grid-column: 2;
+    background: lightblue;
+    z-index: 1;
 }

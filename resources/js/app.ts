@@ -17,6 +17,11 @@ library.add(faBuilding, faTachographDigital, faEnvelope, faCalendarDays);
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
+    defaults: {
+        visitOptions: (href, options) => {
+            return { viewTransition: true };
+        },
+    },
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
         switch (true) {

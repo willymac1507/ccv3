@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Concerns\Organisations;
 use App\Concerns\Students;
 use App\Models\Organisation;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -88,10 +87,8 @@ class OrganisationController extends Controller
         return Inertia::render('organisation/SearchStudents', ['salon' => $organisation]);
     }
 
-    public function getAvailableStudents(Organisation $organisation, Request $request)
+    public function getAvailable(Request $request)
     {
-        return $organisation->students()
-            ->with(['shifts', 'services'])
-            ->get();
+        return $this->getAvailableStudents($request->salon, $request->day);
     }
 }

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { Head } from '@inertiajs/vue3';
 import type { ComputedRef } from 'vue';
 import { computed, provide } from 'vue';
@@ -28,7 +28,6 @@ defineOptions({
 const appointments: ComputedRef<any[] | undefined> = computed(
     () => props.appointmentsAsStudent,
 );
-console.log(props.appointmentsAsStudent);
 provide('appointments', appointments);
 </script>
 

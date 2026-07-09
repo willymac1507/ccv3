@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Concerns\Organisations;
 use App\Models\Appointment;
-use App\Models\Organisation;
+use App\Models\Shift;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Random\RandomException;
 
 class AppointmentController extends Controller
 {
@@ -19,21 +19,21 @@ class AppointmentController extends Controller
      */
     public function index(User $user)
     {
-        $student = User::with(['organisation'])->find($user->id);
+        $appointments = Appointment::where(['student' => $user->id, 'date' => request('date')])->get();
+        $student = User::find($user->id);
+        $shift = Shift::where(['user_id' => $user->id, 'day' => Carbon::parse(request('date'))->format('l')])->first();
 
-        return Inertia::render('appointment/Index');
+        return Inertia::render('appointment/Index', [
+            'student' => $student,
+            'appointments' => $appointments ?? '',
+            'shift' => $shift,
+            'date' => new Carbon(request('date')),
+        ]);
     }
 
-    /**
-     * Search for an appointment from one or more salons.
-     *
-     * @throws RandomException
-     */
-    public function searchStudents(Organisation $organisation)
+    public function showStudentAppointments(User $user, Request $request)
     {
-        $salon = $this->getOrganisationWithStudents($organisation->id);
-
-        return Inertia::render('appointment/SearchStudents', ['salon' => $salon]);
+        //
     }
 
     /**

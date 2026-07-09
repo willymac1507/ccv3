@@ -4,6 +4,7 @@ import { Head, router } from '@inertiajs/vue3';
 import type { Ref } from 'vue';
 import { onMounted } from 'vue';
 import { ref } from 'vue';
+import { toast } from 'vue-sonner';
 import { AdvancedMarker, GoogleMap, MarkerCluster } from 'vue3-google-map';
 import Heading from '../../components/Heading.vue';
 import organisations from '../../routes/organisations';
@@ -41,6 +42,26 @@ async function geocode(
     }
 }
 
+async function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (result) => {
+                const { latitude, longitude } = result.coords;
+                centerCoords.value = {
+                    lat: latitude,
+                    lng: longitude,
+                };
+                mapReady.value = true;
+                toast.success('Location found successfully', {});
+            },
+            (error) => {
+                toast.error('Error getting location. Please try again.', {});
+                console.error('Error getting location:', error);
+            },
+        );
+    }
+}
+
 function selectSalon(id: number) {
     router.get('/organisations/' + id + '/available-students');
     // if (salonsSelected.value.find((salon) => salon.id === id)) {
@@ -70,17 +91,6 @@ interface Salon {
 
     [key: string]: any;
 }
-
-interface SalonPartial extends Salon {
-    id: number;
-    name: string;
-    postcode?: never;
-    lat?: never;
-    lng?: never;
-
-    [key: string]: any;
-}
-
 interface SalonFull extends Salon {
     id: number;
     name: string;
@@ -151,6 +161,13 @@ defineProps<Props>();
                     type="text"
                 />
                 <button
+                    class="btn btn-active ml-4 cursor-pointer"
+                    @click="getLocation()"
+                >
+                    Use my location
+                </button>
+                <button
+                    :disabled="!centerLocation.length"
                     class="btn btn-active ml-4 cursor-pointer"
                     @click="findCoords()"
                 >

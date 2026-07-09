@@ -1,13 +1,12 @@
 <script lang="ts" setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, useHttp } from '@inertiajs/vue3';
 import axios from 'axios';
-import { getDay } from 'date-fns';
+import { format, getDay } from 'date-fns';
 import type { Ref } from 'vue';
 import { watch } from 'vue';
 import { computed, ref } from 'vue';
 import DatePicker from '@/components/DatePicker.vue';
 import Heading from '@/components/Heading.vue';
-import { Badge } from '@/components/ui/badge';
 import {
     Card,
     CardContent,
@@ -18,6 +17,15 @@ import {
 import organisations from '@/routes/organisations';
 import { index } from '@/routes/shifts';
 
+interface HttpForm {
+    salon: number;
+    day: number;
+}
+
+interface HttpResponse {
+    id: number;
+    name: string;
+}
 interface Props {
     salon: Salon;
 }
@@ -52,22 +60,22 @@ const selectedDay = computed(() => {
 
 const availableStudents: Ref = ref([]);
 
-watch(
-    () => !isNaN(selectedDay.value),
-    async () => {
-        const response = await axios.get(
-            '/api/organisations/' + props.salon.id + '/students/available',
-            {
-                params: {
-                    day: selectedDay.value,
-                    salon: props.salon.id,
-                },
-            },
-        );
-        console.log(response.data);
-        availableStudents.value = response.data;
-    },
-);
+const http = useHttp<HttpForm, HttpResponse>({
+    salon: props.salon.id,
+    day: 0,
+});
+
+// watch(() => !isNaN(selectedDay.value), getAvailableStudents);
+watch(selectedDate, getAvailableStudents);
+
+function getAvailableStudents() {
+    http.day = selectedDay.value;
+    http.get('/api/organisations/students/available', {
+        onSuccess: (response) => {
+            availableStudents.value = response;
+        },
+    });
+}
 // const availableStudents: Promise<AxiosResponse<any>> | null = !isNaN(
 //     selectedDate.value,
 // )
@@ -127,39 +135,54 @@ defineOptions({
                 <CardContent v-if="selectedDate">
                     <div v-if="availableStudents.length" class="flex flex-col">
                         <p class="mb-2 font-bold">Available Students</p>
-                        <table class="border-spacing-2">
-                            <thead>
-                                <tr>
-                                    <td>Student</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr
-                                    v-for="student in availableStudents"
-                                    :key="student.id"
-                                    class="text-sm text-muted-foreground"
-                                >
-                                    <td>
-                                        <Link
-                                            :href="
-                                                '/students/' +
-                                                student.id +
-                                                '/appointments'
-                                            "
-                                            >{{ student.name }}</Link
-                                        >
-                                    </td>
-                                    <td
-                                        v-for="service in student.services"
-                                        :key="service.id"
+                        <div
+                            class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100"
+                        >
+                            <table class="table">
+                                <!-- head -->
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Services Offered</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- row 1 -->
+                                    <tr
+                                        v-for="student in availableStudents"
+                                        :key="student.id"
                                     >
-                                        <Badge variant="secondary"
-                                            >{{ service.name }}
-                                        </Badge>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                        <td>
+                                            <Link
+                                                :data="{
+                                                    date: format(
+                                                        selectedDate,
+                                                        'yyyy-MM-dd',
+                                                    ),
+                                                }"
+                                                :href="
+                                                    '/students/' +
+                                                    student.id +
+                                                    '/appointments'
+                                                "
+                                                method="get"
+                                                view-transition
+                                                >{{ student.name }}</Link
+                                            >
+                                        </td>
+                                        <td>
+                                            <div
+                                                v-for="service in student.services"
+                                                v-bind:key="service.id"
+                                                class="mr-2 badge badge-soft px-2 badge-primary"
+                                            >
+                                                {{ service.name }}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <div v-if="!availableStudents.length">
                         <p class="mb-2 font-bold">
