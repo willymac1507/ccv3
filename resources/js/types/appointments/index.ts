@@ -10,6 +10,11 @@ export type Props = {
 export type PageProps = {
     props: {
         date: Date;
+        auth: {
+            user: {
+                id: number;
+            };
+        };
         shift: {
             startTime: string;
             endTime: string;

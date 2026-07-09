@@ -19,7 +19,9 @@ class AppointmentController extends Controller
      */
     public function index(User $user)
     {
-        $appointments = Appointment::where(['student' => $user->id, 'date' => request('date')])->get();
+        $appointments = Appointment::where(['student' => $user->id, 'date' => request('date')])
+            ->with('client:name,id')
+            ->get();
         $student = User::find($user->id);
         $shift = Shift::where(['user_id' => $user->id, 'day' => Carbon::parse(request('date'))->format('l')])->first();
 
