@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { Head, usePage } from '@inertiajs/vue3';
-import { format, getHours, parse, roundToNearestHours } from 'date-fns';
+import { format } from 'date-fns';
 import type { ComputedRef } from 'vue';
 import { computed, reactive } from 'vue';
 import Heading from '@/components/Heading.vue';
@@ -26,9 +26,8 @@ defineOptions({
 });
 
 const page: PageProps = usePage();
-
 const selectedDate: Date = page.props.date;
-const { startTime, endTime, breakTime, duration } = reactive(page.props.shift);
+const { startTime, endTime } = reactive(page.props.shift);
 
 const calendarStart = minutesFromTime(startTime);
 const calendarEnd = minutesFromTime(endTime);
@@ -42,24 +41,28 @@ const slots: ComputedRef = computed(() => {
     for (let mins = calendarStart; mins < calendarEnd; mins += interval) {
         switch (mins % 60) {
             case 0:
-                result.push(
-                    `${String(Math.trunc(mins / 60)).padStart(2, '0')}:00`,
-                );
+                result.push({
+                    label: `${String(Math.trunc(mins / 60)).padStart(2, '0')}:00`,
+                    blocked: false,
+                });
                 break;
             case 15:
-                result.push(
-                    `${String(Math.trunc(mins / 60)).padStart(2, '0')}:15`,
-                );
+                result.push({
+                    label: `${String(Math.trunc(mins / 60)).padStart(2, '0')}:15`,
+                    blocked: false,
+                });
                 break;
             case 30:
-                result.push(
-                    `${String(Math.trunc(mins / 60)).padStart(2, '0')}:30`,
-                );
+                result.push({
+                    label: `${String(Math.trunc(mins / 60)).padStart(2, '0')}:30`,
+                    blocked: false,
+                });
                 break;
             case 45:
-                result.push(
-                    `${String(Math.trunc(mins / 60)).padStart(2, '0')}:45`,
-                );
+                result.push({
+                    label: `${String(Math.trunc(mins / 60)).padStart(2, '0')}:45`,
+                    blocked: false,
+                });
                 break;
             default:
                 result.push('');
@@ -68,6 +71,29 @@ const slots: ComputedRef = computed(() => {
 
     return result;
 });
+
+const vBlock = {
+    mounted(el: any, binding: any) {
+        const start = binding.value.row - 2;
+        const end = start + binding.value.span;
+
+        for (let i = start; i < end; i++) {
+            slots.value[i].blocked = true;
+        }
+    },
+};
+
+function appointmentStatusClass(appointment: any) {
+    if (appointment.status === 'cancelled') {
+        return 'bg-red-500/10 hover:bg-red-500/20 text-red-500';
+    } else if (appointment.status === 'confirmed') {
+        return 'bg-green-500/10 hover:bg-green-500/20 text-green-500';
+    } else if (appointment.status === 'pending') {
+        return 'bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-500';
+    } else {
+        return 'bg-blue-500/10 hover:bg-blue-500/20 text-blue-500';
+    }
+}
 
 function minutesFromTime(time: string) {
     const [hours, minutes] = time.split(':').map(Number);
@@ -138,7 +164,7 @@ function rowForTime(time: string) {
                                 <!-- Horizontal lines -->
                                 <div
                                     :style="`grid-template-rows: repeat(${slots.length}, minmax(1.75rem, 1fr));`"
-                                    class="col-start-1 col-end-2 row-start-1 grid divide-y divide-gray-100 dark:divide-white/5"
+                                    class="col-start-1 col-end-2 row-start-1 grid cursor-crosshair divide-y divide-gray-100 dark:divide-white/5"
                                 >
                                     <div class="row-end-1 h-7"></div>
                                     <div
@@ -148,7 +174,7 @@ function rowForTime(time: string) {
                                         <div
                                             class="-mt-2.5 -ml-14 w-14 pr-2 text-right font-mono text-xs/5 text-gray-400 dark:text-gray-500"
                                         >
-                                            {{ slot }}
+                                            {{ slot.label }}
                                         </div>
                                     </div>
                                     <div></div>
@@ -159,42 +185,31 @@ function rowForTime(time: string) {
                                     :style="`grid-template-rows: 1.75rem repeat(${slots.length}, minmax(0, 1fr)) auto;`"
                                     class="col-start-1 col-end-2 row-start-1 grid grid-cols-1"
                                 >
-                                    <!-- Break -->
-                                    <li
-                                        v-if="breakTime"
-                                        :style="`grid-row: ${rowForTime(breakTime)} / span ${duration / 15}`"
-                                        class="relative mt-px flex dark:before:pointer-events-none dark:before:absolute dark:before:inset-1 dark:before:z-0 dark:before:rounded-lg dark:before:bg-gray-900"
-                                    >
-                                        <div
-                                            class="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-blue-50 px-2 text-xs/5 hover:bg-blue-100 dark:bg-blue-600/15 dark:hover:bg-blue-600/20"
-                                        >
-                                            <p
-                                                class="order-1 font-semibold text-blue-700 dark:text-blue-300"
-                                            >
-                                                Break
-                                            </p>
-                                            <p
-                                                class="text-blue-500 group-hover:text-blue-700 dark:text-blue-400 dark:group-hover:text-blue-300"
-                                            ></p>
-                                        </div>
-                                    </li>
                                     <li
                                         v-for="appointment in appointments"
                                         :key="appointment.id"
+                                        v-block="{
+                                            row: rowForTime(appointment.time),
+                                            span: appointment.duration,
+                                        }"
                                         :style="`grid-row: ${rowForTime(appointment.time)} / span ${appointment.duration}`"
                                         class="relative mt-px flex dark:before:pointer-events-none dark:before:absolute dark:before:inset-1 dark:before:z-0 dark:before:rounded-lg dark:before:bg-gray-900"
                                     >
                                         <div
-                                            class="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-blue-50 px-2 py-1 text-xs/5 hover:bg-green-100 dark:bg-green-600/15 dark:hover:bg-green-600/20"
+                                            :class="
+                                                appointmentStatusClass(
+                                                    appointment,
+                                                )
+                                            "
+                                            class="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg px-2 text-xs/5"
                                         >
                                             <p
-                                                class="font-semibold text-green-700 dark:text-green-300"
+                                                v-if="myDiary"
+                                                class="font-semibold"
                                             >
                                                 {{ appointment.client.name }}
                                             </p>
-                                            <p
-                                                class="text-green-500 group-hover:text-green-700 dark:text-green-400 dark:group-hover:text-green-300"
-                                            >
+                                            <p>
                                                 {{ appointment.description }}
                                             </p>
                                         </div>
