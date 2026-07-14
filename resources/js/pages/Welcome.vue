@@ -46,15 +46,18 @@ import { register } from '@/routes';
                 class="flex w-full max-w-83.75 flex-col-reverse overflow-hidden rounded-lg lg:max-w-4xl lg:flex-row"
             >
                 <div
-                    class="relative -mb-px aspect-335/364 w-full shrink-0 overflow-hidden rounded-t-lg lg:mb-0 lg:-ml-px lg:aspect-auto lg:w-109.5 lg:rounded-t-none lg:rounded-r-lg"
+                    class="relative -mb-px aspect-335/364 w-full shrink-0 overflow-hidden rounded-t-lg bg-white p-8 lg:mb-0 lg:-ml-px lg:aspect-auto lg:w-109.5 lg:rounded-t-none lg:rounded-l-lg"
                 >
                     <!-- Logo -->
-                    <img alt="" src="/images/ccv3Logo.png" srcset="">
+                    <img alt="" src="/images/ccv3Logo.png" srcset="" />
+                </div>
+                <div
+                    class="relative -mb-px grid aspect-335/364 w-full shrink-0 items-center overflow-hidden rounded-t-lg bg-white p-8 lg:mb-0 lg:-ml-px lg:aspect-auto lg:w-109.5 lg:rounded-t-none lg:rounded-r-lg"
+                >
+                    <img alt="" src="/images/Asset%201@2x.png" />
                 </div>
             </main>
         </div>
         <div class="hidden h-14.5 lg:block"></div>
     </div>
 </template>
-
-

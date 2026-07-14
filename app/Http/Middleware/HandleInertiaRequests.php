@@ -63,16 +63,19 @@ class HandleInertiaRequests extends Middleware
                 'href' => '#',
                 'icon' => 'fa-solid fa-envelope',
             ],
-        ];
-
-        $clientNavItems = [
             [
                 'title' => 'Appointments',
                 'href' => '#',
                 'icon' => 'fa-solid fa-calendar-days',
                 'items' => [
-                    'title' => 'Search',
-                    'href' => '/organisations/search',
+                    [
+                        'title' => 'Search',
+                        'href' => '/organisations/search',
+                    ],
+                    [
+                        'title' => 'My Appointments',
+                        'href' => '#',
+                    ],
                 ],
             ],
         ];
@@ -102,9 +105,6 @@ class HandleInertiaRequests extends Middleware
             }
             if ($request->user()->hasRole('Student')) {
                 $navItems = array_merge($navItems, $studentNavItems);
-            }
-            if ($request->user()->hasRole('Client')) {
-                $navItems = array_merge($navItems, $clientNavItems);
             }
 
             return $navItems;
