@@ -100,6 +100,7 @@ interface LatLng {
 
 interface Props {
     salons: Array<SalonFull>;
+    favouriteSalons: Array<SalonFull>;
 }
 
 interface GeocoderRequest {
@@ -165,6 +166,20 @@ defineProps<Props>();
                 >
                     Search
                 </button>
+            </div>
+
+            <div v-if="!mapReady">
+                <h2 class="mb-2 text-lg font-medium">Favourite Salons</h2>
+                <ol class="gap-y-2">
+                    <li v-for="salon in favouriteSalons" :key="salon.id">
+                        <button
+                            class="btn btn-secondary"
+                            @click="selectSalon(salon.id)"
+                        >
+                            {{ salon.name }}
+                        </button>
+                    </li>
+                </ol>
             </div>
 
             <div v-if="mapReady">

@@ -24,6 +24,35 @@ class AppointmentController extends Controller
             ->get());
         $student = User::find($user->id);
         $shift = Shift::where(['user_id' => $user->id, 'day' => Carbon::parse(request('date'))->format('l')])->first();
+        $cleanUpTime = new Carbon($shift['endTime'])->subMinutes(15)->format('H:i:s');
+        $setUpAppt = [
+            'id' => 999999999999999997,
+            'date' => request('date'),
+            'time' => $shift['startTime'],
+            'duration' => 1,
+            'student' => $user->id,
+            'client' => [
+                'id' => $user->id,
+                'name' => $user->name,
+            ],
+            'description' => 'Set up',
+            'status' => '',
+        ];
+        $appointments[] = $setUpAppt;
+        $cleanUpAppt = [
+            'id' => 999999999999999998,
+            'date' => request('date'),
+            'time' => $cleanUpTime,
+            'duration' => 1,
+            'student' => $user->id,
+            'client' => [
+                'id' => $user->id,
+                'name' => $user->name,
+            ],
+            'description' => 'Clean up',
+            'status' => '',
+        ];
+        $appointments[] = $cleanUpAppt;
         if ($shift['breakTime']) {
             $break = [
                 'id' => 999999999999999999,

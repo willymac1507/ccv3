@@ -6,6 +6,7 @@ use App\Concerns\Organisations;
 use App\Concerns\Students;
 use App\Models\Organisation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class OrganisationController extends Controller
@@ -76,9 +77,10 @@ class OrganisationController extends Controller
     public function search()
     {
         $organisations = $this->getAllOrganisations()->select(['id', 'name', 'postcode', 'lat', 'lng']);
-
+        $favouriteOrgs = $this->getFavouriteOrganisations(Auth::user())->select(['id', 'name', 'postcode', 'lat', 'lng']);
         return Inertia::render('organisation/Search', [
             'salons' => $organisations,
+            'favouriteSalons' => $favouriteOrgs,
         ]);
     }
 

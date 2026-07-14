@@ -2,9 +2,7 @@
 import { Head, usePage } from '@inertiajs/vue3';
 import { format } from 'date-fns';
 import type { ComputedRef } from 'vue';
-import { ref } from 'vue';
 import { computed, reactive } from 'vue';
-import BookingForm from '@/components/BookingForm.vue';
 import Heading from '@/components/Heading.vue';
 import { index } from '@/routes/appointments';
 import organisations from '@/routes/organisations';
@@ -223,8 +221,7 @@ function clicked(event: any) {
                                     >
                                         <component
                                             :is="
-                                                appointment.description ===
-                                                'Break'
+                                                !appointment.status
                                                     ? 'div'
                                                     : 'a'
                                             "
@@ -257,7 +254,7 @@ function clicked(event: any) {
                                     <li
                                         v-for="(slot, index) in slots"
                                         v-show="!slot.blocked"
-                                        :key="index"
+                                        :key="slot.blocked"
                                         :style="`grid-row: ${rowForTime(slot.label)} / span 1;`"
                                         class="z-1 col-start-1"
                                     >

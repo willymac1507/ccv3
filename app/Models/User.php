@@ -36,19 +36,6 @@ class User extends Authenticatable implements AuthorizableContract
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasRoles, Notifiable;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
-
     public function appointmentsAsStudent(): HasMany
     {
         return $this->hasMany(Appointment::class, 'student');
@@ -62,6 +49,11 @@ class User extends Authenticatable implements AuthorizableContract
     public function shifts(): HasMany
     {
         return $this->hasMany(Shift::class);
+    }
+
+    public function favouriteOrganisations(): BelongsToMany
+    {
+        return $this->belongsToMany(Organisation::class);
     }
 
     public function organisation(): BelongsTo
@@ -78,5 +70,18 @@ class User extends Authenticatable implements AuthorizableContract
     {
         return $this->belongsToMany(Slot::class);
 
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
     }
 }
