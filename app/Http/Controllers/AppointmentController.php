@@ -19,11 +19,27 @@ class AppointmentController extends Controller
      */
     public function index(User $user)
     {
-        $appointments = Appointment::where(['student' => $user->id, 'date' => request('date')])
+        $appointments = $this->getAppointmentsAsArray(Appointment::where(['student' => $user->id, 'date' => request('date')])
             ->with('client:name,id')
-            ->get();
+            ->get());
         $student = User::find($user->id);
         $shift = Shift::where(['user_id' => $user->id, 'day' => Carbon::parse(request('date'))->format('l')])->first();
+        if ($shift['breakTime']) {
+            $break = [
+                'id' => 999999999999999999,
+                'date' => request('date'),
+                'time' => $shift['breakTime'],
+                'duration' => $shift['duration'] / 15,
+                'student' => $user->id,
+                'client' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                ],
+                'description' => 'Break',
+                'status' => '',
+            ];
+            $appointments[] = $break;
+        }
 
         return Inertia::render('appointment/Index', [
             'student' => $student,
@@ -31,6 +47,11 @@ class AppointmentController extends Controller
             'shift' => $shift,
             'date' => new Carbon(request('date')),
         ]);
+    }
+
+    private function getAppointmentsAsArray($appointments)
+    {
+        return $appointments->toArray();
     }
 
     public function showStudentAppointments(User $user, Request $request)

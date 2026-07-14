@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { Head, Link, useHttp } from '@inertiajs/vue3';
-import axios from 'axios';
 import { format, getDay } from 'date-fns';
 import type { Ref } from 'vue';
 import { watch } from 'vue';
@@ -65,7 +64,6 @@ const http = useHttp<HttpForm, HttpResponse>({
     day: 0,
 });
 
-// watch(() => !isNaN(selectedDay.value), getAvailableStudents);
 watch(selectedDate, getAvailableStudents);
 
 function getAvailableStudents() {
@@ -76,16 +74,6 @@ function getAvailableStudents() {
         },
     });
 }
-// const availableStudents: Promise<AxiosResponse<any>> | null = !isNaN(
-//     selectedDate.value,
-// )
-//     ? axios.get('/api/students/available', {
-//           params: {
-//               day: selectedDay.value,
-//               salon: props.salon.id,
-//           },
-//       })
-//     : null;
 
 defineOptions({
     layout: {
@@ -174,7 +162,7 @@ defineOptions({
                                             <div
                                                 v-for="service in student.services"
                                                 v-bind:key="service.id"
-                                                class="mr-2 badge badge-soft px-2 badge-primary"
+                                                class="mr-2 badge badge-soft px-2 badge-secondary"
                                             >
                                                 {{ service.name }}
                                             </div>

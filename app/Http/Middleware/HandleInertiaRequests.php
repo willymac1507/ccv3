@@ -45,8 +45,7 @@ class HandleInertiaRequests extends Middleware
                 'shifts' => $request->user() ? $request->user()->shifts()->orderBy('dayNumber', 'asc')->get() : null,
             ],
             'services' => Service::all(),
-            'slots' => [],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'mainNavItems' => $this->setNavItems($request),
         ];
     }
@@ -64,6 +63,29 @@ class HandleInertiaRequests extends Middleware
                 'href' => '#',
                 'icon' => 'fa-solid fa-envelope',
             ],
+            [
+                'title' => 'Appointments',
+                'href' => '#',
+                'icon' => 'fa-solid fa-calendar-days',
+                'items' => [
+                    [
+                        'title' => 'Search',
+                        'href' => '/organisations/search',
+                    ],
+                    [
+                        'title' => 'My Appointments',
+                        'href' => '#',
+                    ],
+                ],
+            ],
+        ];
+
+        $studentNavItems = [
+            [
+                'title' => 'Clients',
+                'href' => '#',
+                'icon' => 'fa-solid fa-users',
+            ],
         ];
 
         $superAdminNavItems = [
@@ -76,11 +98,16 @@ class HandleInertiaRequests extends Middleware
 
         if ($request->user()) {
 
-            if (! $request->user()->hasRole('Super Admin')) {
-                return $standardNavItems;
+            $navItems = $standardNavItems;
+
+            if ($request->user()->hasRole('Super Admin')) {
+                $navItems = array_merge($navItems, $superAdminNavItems);
+            }
+            if ($request->user()->hasRole('Student')) {
+                $navItems = array_merge($navItems, $studentNavItems);
             }
 
-            return array_merge($standardNavItems, $superAdminNavItems);
+            return $navItems;
         }
 
         return null;
