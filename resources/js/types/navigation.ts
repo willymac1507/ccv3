@@ -11,4 +11,5 @@ export type NavItem = {
     icon?: string;
     gate?: string;
     isActive?: boolean;
+    items?: NavItem[];
 };
