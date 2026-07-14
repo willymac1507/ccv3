@@ -2,7 +2,9 @@
 import { Head } from '@inertiajs/vue3';
 import type { ComputedRef } from 'vue';
 import { computed, provide } from 'vue';
-import PlaceholderPattern from '@/components/PlaceholderPattern.vue';
+import DashMiniSectionA from '@/components/Dashboard/DashMiniSectionA.vue';
+import DashMiniSectionB from '@/components/Dashboard/DashMiniSectionB.vue';
+import DashMiniSectionC from '@/components/Dashboard/DashMiniSectionC.vue';
 import { dashboard } from '@/routes';
 import DashMainSection from '../components/Dashboard/DashMainSection.vue';
 
@@ -41,17 +43,17 @@ provide('appointments', appointments);
             <div
                 class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
             >
-                <PlaceholderPattern />
+                <DashMiniSectionA />
             </div>
             <div
                 class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
             >
-                <PlaceholderPattern />
+                <DashMiniSectionB />
             </div>
             <div
                 class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
             >
-                <PlaceholderPattern />
+                <DashMiniSectionC />
             </div>
         </div>
         <div

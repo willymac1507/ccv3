@@ -64,14 +64,6 @@ async function getLocation() {
 
 function selectSalon(id: number) {
     router.get('/organisations/' + id + '/available-students');
-    // if (salonsSelected.value.find((salon) => salon.id === id)) {
-    //     const indexToDelete = salonsSelected.value.findIndex(
-    //         (salon) => salon.id === id,
-    //     );
-    //     salonsSelected.value.splice(indexToDelete, 1);
-    // } else {
-    //     salonsSelected.value.push({ id: id, name: name });
-    // }
 }
 
 async function findCoords() {
@@ -161,14 +153,14 @@ defineProps<Props>();
                     type="text"
                 />
                 <button
-                    class="btn btn-active ml-4 cursor-pointer"
+                    class="btn ml-4 cursor-pointer btn-primary"
                     @click="getLocation()"
                 >
                     Use my location
                 </button>
                 <button
                     :disabled="!centerLocation.length"
-                    class="btn btn-active ml-4 cursor-pointer"
+                    class="btn ml-4 cursor-pointer btn-primary"
                     @click="findCoords()"
                 >
                     Search

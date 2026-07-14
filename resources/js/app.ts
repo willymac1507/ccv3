@@ -4,6 +4,7 @@ import {
     faTachographDigital,
     faEnvelope,
     faCalendarDays,
+    faUsers,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { createInertiaApp } from '@inertiajs/vue3';
@@ -13,7 +14,13 @@ import AuthLayout from '@/layouts/AuthLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { initializeFlashToast } from '@/lib/flashToast';
 
-library.add(faBuilding, faTachographDigital, faEnvelope, faCalendarDays);
+library.add(
+    faBuilding,
+    faTachographDigital,
+    faEnvelope,
+    faCalendarDays,
+    faUsers,
+);
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({

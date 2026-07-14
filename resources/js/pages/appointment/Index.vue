@@ -2,7 +2,9 @@
 import { Head, usePage } from '@inertiajs/vue3';
 import { format } from 'date-fns';
 import type { ComputedRef } from 'vue';
+import { ref } from 'vue';
 import { computed, reactive } from 'vue';
+import BookingForm from '@/components/BookingForm.vue';
 import Heading from '@/components/Heading.vue';
 import { index } from '@/routes/appointments';
 import organisations from '@/routes/organisations';
@@ -83,6 +85,8 @@ const vBlock = {
     },
 };
 
+let freeSlotsCount = 0;
+
 function appointmentStatusClass(appointment: any) {
     if (appointment.status === 'cancelled') {
         return 'bg-red-500/10 hover:bg-red-500/20 text-red-500';
@@ -104,6 +108,26 @@ function rowForTime(time: string) {
     const [hours, minutes] = time.split(':').map(Number);
 
     return (hours * 60 - calendarStart + minutes) / interval + 2;
+}
+
+function clicked(event: any) {
+    freeSlotsCount = 0;
+
+    for (let i = event.target.value; i < slots.value.length; i++) {
+        if (slots.value[i].blocked) {
+            console.log('Free Slots', freeSlotsCount);
+
+            break;
+        } else if (i === slots.value.length - 1) {
+            freeSlotsCount++;
+            console.log('Free Slots', freeSlotsCount);
+
+            break;
+        }
+
+        console.log(i, 'Free');
+        freeSlotsCount++;
+    }
 }
 </script>
 
@@ -164,7 +188,7 @@ function rowForTime(time: string) {
                                 <!-- Horizontal lines -->
                                 <div
                                     :style="`grid-template-rows: repeat(${slots.length}, minmax(1.75rem, 1fr));`"
-                                    class="col-start-1 col-end-2 row-start-1 grid cursor-crosshair divide-y divide-gray-100 dark:divide-white/5"
+                                    class="col-start-1 col-end-2 row-start-1 grid divide-y divide-gray-100 dark:divide-white/5"
                                 >
                                     <div class="row-end-1 h-7"></div>
                                     <div
@@ -180,10 +204,12 @@ function rowForTime(time: string) {
                                     <div></div>
                                 </div>
 
+                                <!-- Booking Buttons -->
+
                                 <!-- Events -->
                                 <ol
                                     :style="`grid-template-rows: 1.75rem repeat(${slots.length}, minmax(0, 1fr)) auto;`"
-                                    class="col-start-1 col-end-2 row-start-1 grid grid-cols-1"
+                                    class="z-10 col-start-1 col-end-2 row-start-1 grid grid-cols-1"
                                 >
                                     <li
                                         v-for="appointment in appointments"
@@ -193,13 +219,27 @@ function rowForTime(time: string) {
                                             span: appointment.duration,
                                         }"
                                         :style="`grid-row: ${rowForTime(appointment.time)} / span ${appointment.duration}`"
-                                        class="relative mt-px flex dark:before:pointer-events-none dark:before:absolute dark:before:inset-1 dark:before:z-0 dark:before:rounded-lg dark:before:bg-gray-900"
+                                        class="relative z-10 col-start-1 mt-px flex dark:before:pointer-events-none dark:before:absolute dark:before:inset-1 dark:before:z-0 dark:before:rounded-lg dark:before:bg-gray-900"
                                     >
-                                        <div
+                                        <component
+                                            :is="
+                                                appointment.description ===
+                                                'Break'
+                                                    ? 'div'
+                                                    : 'a'
+                                            "
                                             :class="
                                                 appointmentStatusClass(
                                                     appointment,
                                                 )
+                                            "
+                                            :href="
+                                                appointment.description ===
+                                                'Break'
+                                                    ? '#'
+                                                    : '/appointments/' +
+                                                      appointment.id +
+                                                      '/show'
                                             "
                                             class="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg px-2 text-xs/5"
                                         >
@@ -212,7 +252,20 @@ function rowForTime(time: string) {
                                             <p>
                                                 {{ appointment.description }}
                                             </p>
-                                        </div>
+                                        </component>
+                                    </li>
+                                    <li
+                                        v-for="(slot, index) in slots"
+                                        v-show="!slot.blocked"
+                                        :key="index"
+                                        :style="`grid-row: ${rowForTime(slot.label)} / span 1;`"
+                                        class="z-1 col-start-1"
+                                    >
+                                        <button
+                                            :value="index"
+                                            class="h-full w-full cursor-pointer"
+                                            @click="clicked($event)"
+                                        ></button>
                                     </li>
                                 </ol>
                             </div>
