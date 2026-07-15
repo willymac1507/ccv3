@@ -7,6 +7,7 @@ import {
     faUsers,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { setOptions } from '@googlemaps/js-api-loader';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { initializeTheme } from '@/composables/useAppearance';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -46,6 +47,7 @@ createInertiaApp({
         color: '#4B5563',
     },
     withApp: function (app) {
+        setOptions({ key: import.meta.env.VITE_GOOGLE_MAPS_API_KEY });
         // @ts-expect-error - below code is too complex to expand
         app.component('font-awesome-icon', FontAwesomeIcon);
     },

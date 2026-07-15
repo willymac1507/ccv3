@@ -5,8 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -19,9 +18,8 @@ return new class extends Migration
             $table->foreignIdFor(User::class, 'client')->constrained()->cascadeOnDelete();
             $table->date('date');
             $table->time('time');
-            $table->integer('duration');
             $table->string('location');
-            $table->text('description');
+            $table->foreignId('service_id')->constrained()->cascadeOnDelete();
             $table->string('status')->default('pending');
         });
     }

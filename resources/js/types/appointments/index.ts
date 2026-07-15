@@ -24,5 +24,6 @@ export type PageProps = {
             day: string;
             duration: number;
         };
+        services: Array<any>;
     };
 };

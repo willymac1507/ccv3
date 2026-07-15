@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { setOptions, importLibrary } from '@googlemaps/js-api-loader';
+import { importLibrary } from '@googlemaps/js-api-loader';
 import { Head, router } from '@inertiajs/vue3';
 import type { Ref } from 'vue';
 import { onMounted } from 'vue';
@@ -17,7 +17,6 @@ const mapReady: Ref = ref(false);
 ref([]);
 
 onMounted(async () => {
-    setOptions({ key: import.meta.env.VITE_GOOGLE_MAPS_API_KEY });
     const { Geocoder } = await importLibrary('geocoding');
     geocoder = new Geocoder();
 });
@@ -213,6 +212,7 @@ defineProps<Props>();
                                     lat: parseFloat(salon.lat),
                                     lng: parseFloat(salon.lng),
                                 },
+                                title: salon.name,
                                 gmpClickable: true,
                             }"
                             :pin-options="{

@@ -27,4 +27,9 @@ class Appointment extends Model
     {
         return $this->hasOneThrough(Organisation::class, User::class);
     }
+
+    public function service(): BelongsTo
+    {
+        return $this->belongsTo(Service::class);
+    }
 }

@@ -2,8 +2,22 @@
 import { Head, usePage } from '@inertiajs/vue3';
 import { format } from 'date-fns';
 import type { ComputedRef } from 'vue';
+import { watch } from 'vue';
+import { ref } from 'vue';
 import { computed, reactive } from 'vue';
 import Heading from '@/components/Heading.vue';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+    Select,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+    SelectContent,
+} from '@/components/ui/select';
 import { index } from '@/routes/appointments';
 import organisations from '@/routes/organisations';
 import type { Props, PageProps } from '@/types/appointments';
@@ -27,6 +41,7 @@ defineOptions({
 
 const page: PageProps = usePage();
 const selectedDate: Date = page.props.date;
+const allServices: Array<any> = page.props.services;
 const { startTime, endTime } = reactive(page.props.shift);
 
 const calendarStart = minutesFromTime(startTime);
@@ -84,6 +99,10 @@ const vBlock = {
 };
 
 let freeSlotsCount = 0;
+let timeSelected = '';
+const bookForm = ref(false);
+const serviceChosen = ref();
+const serviceDurationError = ref(false);
 
 function appointmentStatusClass(appointment: any) {
     if (appointment.status === 'cancelled') {
@@ -110,23 +129,29 @@ function rowForTime(time: string) {
 
 function clicked(event: any) {
     freeSlotsCount = 0;
+    timeSelected = slots.value[event.target.value].label;
 
     for (let i = event.target.value; i < slots.value.length; i++) {
         if (slots.value[i].blocked) {
             console.log('Free Slots', freeSlotsCount);
-
             break;
         } else if (i === slots.value.length - 1) {
             freeSlotsCount++;
-            console.log('Free Slots', freeSlotsCount);
-
             break;
         }
 
-        console.log(i, 'Free');
         freeSlotsCount++;
     }
+
+    bookForm.value = true;
+    console.log('Clicked: ', timeSelected, 'Free Slots: ', freeSlotsCount);
 }
+
+watch(serviceChosen, () => {
+    if (serviceChosen.value.duration > freeSlotsCount) {
+        alert('Not enough slots available for this service');
+    }
+});
 </script>
 
 <template>
@@ -206,6 +231,7 @@ function clicked(event: any) {
 
                                 <!-- Events -->
                                 <ol
+                                    id="popHere"
                                     :style="`grid-template-rows: 1.75rem repeat(${slots.length}, minmax(0, 1fr)) auto;`"
                                     class="z-10 col-start-1 col-end-2 row-start-1 grid grid-cols-1"
                                 >
@@ -254,7 +280,7 @@ function clicked(event: any) {
                                     <li
                                         v-for="(slot, index) in slots"
                                         v-show="!slot.blocked"
-                                        :key="slot.blocked"
+                                        :key="index"
                                         :style="`grid-row: ${rowForTime(slot.label)} / span 1;`"
                                         class="z-1 col-start-1"
                                     >
@@ -272,4 +298,27 @@ function clicked(event: any) {
             </div>
         </div>
     </div>
+    <Teleport to="#popHere">
+        <Popover v-model:open="bookForm">
+            <PopoverTrigger class="h-full w-full"> </PopoverTrigger>
+            <PopoverContent>
+                <div class="flex flex-col">
+                    <Select v-model="serviceChosen">
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select a service" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem
+                                v-for="service in allServices"
+                                :key="'service: ' + service.id"
+                                :value="service.id"
+                            >
+                                {{ service.name }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+            </PopoverContent>
+        </Popover>
+    </Teleport>
 </template>

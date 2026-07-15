@@ -23,9 +23,8 @@ class AppointmentFactory extends Factory
             'client' => self::factoryForModel(User::class),
             'date' => fake()->dateTimeBetween('now', '+2 month'),
             'time' => fake()->time(),
-            'duration' => fake()->numberBetween(1, 4),
             'location' => fake()->address(),
-            'description' => fake()->paragraph(),
+            'service_id' => fake()->numberBetween(1, 9),
             'status' => fake()->randomElement(['pending', 'confirmed', 'cancelled']),
         ];
     }
