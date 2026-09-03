@@ -10,6 +10,7 @@ class BusytimeLoader
     public function makeSetupBlock($shift): ScheduleItem
     {
         return new ScheduleItem(
+            null,
             $shift->startTime,
             $shift->user_id,
             'Setup',
@@ -22,6 +23,7 @@ class BusytimeLoader
     public function makeCleanupBlock($shift): ScheduleItem
     {
         return new ScheduleItem(
+            null,
             new Carbon($shift['endTime'])->subMinutes(15)->format('H:i:s'),
             $shift->user_id,
             'Cleanup',
@@ -34,6 +36,7 @@ class BusytimeLoader
     public function makeBreakBlock($shift): ScheduleItem
     {
         return new ScheduleItem(
+            null,
             $shift['breakTime'],
             $shift->user_id,
             'Break',

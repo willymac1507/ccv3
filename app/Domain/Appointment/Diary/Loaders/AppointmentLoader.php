@@ -22,6 +22,7 @@ class AppointmentLoader
         $apps = [];
         foreach ($appointments as $appointment) {
             $apps[] = new ScheduleItem(
+                $appointment['id'],
                 $appointment['time'],
                 $appointment['student'],
                 $appointment['client']['name'],

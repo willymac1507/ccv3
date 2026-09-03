@@ -257,10 +257,9 @@ watch(serviceChosen, () => {
                                         :key="appointment.id"
                                         v-block="{
                                             row: rowForTime(appointment.time),
-                                            span: appointment.service
-                                                .min_duration,
+                                            span: appointment.duration,
                                         }"
-                                        :style="`grid-row: ${rowForTime(appointment.time)} / span ${appointment.service.min_duration}`"
+                                        :style="`grid-row: ${rowForTime(appointment.time)} / span ${appointment.duration}`"
                                         class="relative z-10 col-start-1 mt-px flex dark:before:pointer-events-none dark:before:absolute dark:before:inset-1 dark:before:z-0 dark:before:rounded-lg dark:before:bg-gray-900"
                                     >
                                         <component
@@ -275,12 +274,9 @@ watch(serviceChosen, () => {
                                                 )
                                             "
                                             :href="
-                                                appointment.service.name ===
-                                                'Break'
-                                                    ? '#'
-                                                    : '/appointments/' +
-                                                      appointment.id +
-                                                      '/show'
+                                                '/appointments/' +
+                                                appointment.id +
+                                                '/show'
                                             "
                                             class="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg px-2 text-xs/5"
                                         >
@@ -288,10 +284,10 @@ watch(serviceChosen, () => {
                                                 v-if="myDiary"
                                                 class="font-semibold"
                                             >
-                                                {{ appointment.client.name }}
+                                                {{ appointment.client }}
                                             </p>
                                             <p>
-                                                {{ appointment.service.name }}
+                                                {{ appointment.service }}
                                             </p>
                                         </component>
                                     </li>
