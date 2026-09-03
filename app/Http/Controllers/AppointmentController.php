@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Concerns\Organisations;
+use App\Domain\Appointment\Diary\Loaders\AppointmentLoader;
+use App\Domain\Appointment\Diary\Loaders\BusytimeLoader;
 use App\Models\Appointment;
 use App\Models\Shift;
 use App\Models\User;
@@ -17,25 +19,27 @@ class AppointmentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(User $user)
+    public function index(User $student)
     {
-        $appointments = $this->getAppointmentsAsArray(Appointment::where(['student' => $user->id, 'date' => request('date')])
-            ->with('client:name,id')
-            ->get());
-        $student = User::find($user->id);
-        $shift = Shift::where(['user_id' => $user->id, 'day' => Carbon::parse(request('date'))->format('l')])->first();
+        $appointments = new AppointmentLoader()->getAppointments($student->id, request('date'));
+
+        $shift = Shift::where(['user_id' => $student->id, 'day' => Carbon::parse(request('date'))->format('l')])->first();
+        dd($appointments, new BusytimeLoader()->makeSetupBlock($shift));
         $cleanUpTime = new Carbon($shift['endTime'])->subMinutes(15)->format('H:i:s');
         $setUpAppt = [
             'id' => 999999999999999997,
             'date' => request('date'),
             'time' => $shift['startTime'],
-            'duration' => 1,
-            'student' => $user->id,
+            'student' => $student->id,
             'client' => [
-                'id' => $user->id,
-                'name' => $user->name,
+                'id' => $student->id,
+                'name' => $student->name,
             ],
-            'description' => 'Set up',
+            'service' => [
+                'id' => 100,
+                'name' => 'Set up',
+                'min_duration' => 1,
+            ],
             'status' => '',
         ];
         $appointments[] = $setUpAppt;
@@ -43,13 +47,16 @@ class AppointmentController extends Controller
             'id' => 999999999999999998,
             'date' => request('date'),
             'time' => $cleanUpTime,
-            'duration' => 1,
-            'student' => $user->id,
+            'student' => $student->id,
             'client' => [
-                'id' => $user->id,
-                'name' => $user->name,
+                'id' => $student->id,
+                'name' => $student->name,
             ],
-            'description' => 'Clean up',
+            'service' => [
+                'id' => 100,
+                'name' => 'Clean up',
+                'min_duration' => 1,
+            ],
             'status' => '',
         ];
         $appointments[] = $cleanUpAppt;
@@ -58,13 +65,16 @@ class AppointmentController extends Controller
                 'id' => 999999999999999999,
                 'date' => request('date'),
                 'time' => $shift['breakTime'],
-                'duration' => $shift['duration'] / 15,
-                'student' => $user->id,
+                'student' => $student->id,
                 'client' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
+                    'id' => $student->id,
+                    'name' => $student->name,
                 ],
-                'description' => 'Break',
+                'service' => [
+                    'id' => 100,
+                    'name' => 'Break',
+                    'min_duration' => $shift['duration'] / 15,
+                ],
                 'status' => '',
             ];
             $appointments[] = $break;
@@ -78,20 +88,7 @@ class AppointmentController extends Controller
         ]);
     }
 
-    private function getAppointmentsAsArray($appointments)
-    {
-        return $appointments->toArray();
-    }
-
     public function showStudentAppointments(User $user, Request $request)
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
     {
         //
     }
@@ -100,6 +97,15 @@ class AppointmentController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
+    {
+        $appointment = Appointment::create($request->all());
+        $appointment->save();
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
     {
         //
     }
@@ -134,5 +140,10 @@ class AppointmentController extends Controller
     public function destroy(Appointment $appointment)
     {
         //
+    }
+
+    private function getAppointmentsAsArray($appointments)
+    {
+        return $appointments->toArray();
     }
 }

@@ -20,8 +20,9 @@ Route::middleware(['auth', 'role:Student'])->group(function () {
 Route::middleware(['auth', 'role:Client'])->group(function () {
     Route::get('organisations/search', [OrganisationController::class, 'search'])->name('organisations.search');
     Route::get('organisations/{organisation:id}/available-students', [OrganisationController::class, 'availableStudents'])->name('organisations.availableStudents');
-    Route::get('students/{user:id}/appointments', [AppointmentController::class, 'index'])->name('students.appointments.index');
+    Route::get('students/{student}/appointments', [AppointmentController::class, 'index'])->name('students.appointments.index');
     Route::get('api/organisations/students/available', [OrganisationController::class, 'getAvailable'])->name('api.students.available');
+    Route::post('appointment/create', [AppointmentController::class, 'store'])->name('appointments.store');
 });
 
 Route::middleware(['role:Super Admin'])->group(function () {

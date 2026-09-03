@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Head, usePage } from '@inertiajs/vue3';
+import { Head, router, usePage } from '@inertiajs/vue3';
 import { format } from 'date-fns';
 import type { ComputedRef } from 'vue';
 import { watch } from 'vue';
@@ -25,6 +25,7 @@ import type { Props, PageProps } from '@/types/appointments';
 const props = defineProps<Props>();
 
 defineOptions({
+    inheritAttrs: false,
     layout: {
         breadcrumbs: [
             {
@@ -102,7 +103,7 @@ let freeSlotsCount = 0;
 let timeSelected = '';
 const bookForm = ref(false);
 const serviceChosen = ref();
-const serviceDurationError = ref(false);
+const serviceChosenError = ref(false);
 
 function appointmentStatusClass(appointment: any) {
     if (appointment.status === 'cancelled') {
@@ -143,13 +144,29 @@ function clicked(event: any) {
         freeSlotsCount++;
     }
 
+    serviceChosenError.value = false;
+    serviceChosen.value = '';
     bookForm.value = true;
-    console.log('Clicked: ', timeSelected, 'Free Slots: ', freeSlotsCount);
+}
+
+function bookAppt() {
+    router.post('/appointment/create', {
+        student: props.student.id,
+        client: page.props.auth.user.id,
+        service_id: serviceChosen.value,
+        time: timeSelected,
+        date: format(selectedDate, 'yyyy-MM-dd'),
+    });
+    bookForm.value = false;
 }
 
 watch(serviceChosen, () => {
-    if (serviceChosen.value.duration > freeSlotsCount) {
-        alert('Not enough slots available for this service');
+    if (serviceChosen.value) {
+        const serv = page.props.services[serviceChosen.value - 1];
+
+        serviceChosenError.value = serv.min_duration > freeSlotsCount;
+
+        return serviceChosenError;
     }
 });
 </script>
@@ -240,9 +257,10 @@ watch(serviceChosen, () => {
                                         :key="appointment.id"
                                         v-block="{
                                             row: rowForTime(appointment.time),
-                                            span: appointment.duration,
+                                            span: appointment.service
+                                                .min_duration,
                                         }"
-                                        :style="`grid-row: ${rowForTime(appointment.time)} / span ${appointment.duration}`"
+                                        :style="`grid-row: ${rowForTime(appointment.time)} / span ${appointment.service.min_duration}`"
                                         class="relative z-10 col-start-1 mt-px flex dark:before:pointer-events-none dark:before:absolute dark:before:inset-1 dark:before:z-0 dark:before:rounded-lg dark:before:bg-gray-900"
                                     >
                                         <component
@@ -257,7 +275,7 @@ watch(serviceChosen, () => {
                                                 )
                                             "
                                             :href="
-                                                appointment.description ===
+                                                appointment.service.name ===
                                                 'Break'
                                                     ? '#'
                                                     : '/appointments/' +
@@ -273,7 +291,7 @@ watch(serviceChosen, () => {
                                                 {{ appointment.client.name }}
                                             </p>
                                             <p>
-                                                {{ appointment.description }}
+                                                {{ appointment.service.name }}
                                             </p>
                                         </component>
                                     </li>
@@ -302,7 +320,7 @@ watch(serviceChosen, () => {
         <Popover v-model:open="bookForm">
             <PopoverTrigger class="h-full w-full"> </PopoverTrigger>
             <PopoverContent>
-                <div class="flex flex-col">
+                <div class="flex flex-col items-center gap-y-4">
                     <Select v-model="serviceChosen">
                         <SelectTrigger>
                             <SelectValue placeholder="Select a service" />
@@ -311,12 +329,30 @@ watch(serviceChosen, () => {
                             <SelectItem
                                 v-for="service in allServices"
                                 :key="'service: ' + service.id"
+                                :disabled="
+                                    service.min_duration > freeSlotsCount
+                                "
                                 :value="service.id"
                             >
-                                {{ service.name }}
+                                {{ service.name }} -
+                                {{ service.min_duration * 15 }} mins
                             </SelectItem>
                         </SelectContent>
                     </Select>
+                    <button
+                        :disabled="serviceChosen === ''"
+                        class="btn btn-primary"
+                        @click="bookAppt()"
+                    >
+                        Book
+                    </button>
+                </div>
+
+                <div v-if="serviceChosenError">
+                    <p>
+                        There is not enough time for this service. Please select
+                        an earlier time.
+                    </p>
                 </div>
             </PopoverContent>
         </Popover>
