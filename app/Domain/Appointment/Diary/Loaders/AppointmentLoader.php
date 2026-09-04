@@ -2,7 +2,7 @@
 
 namespace App\Domain\Appointment\Diary\Loaders;
 
-use App\Domain\Appointment\DTO\ScheduleItem;
+use App\Domain\Appointment\DTO\ScheduleItemDTO;
 use App\Models\Appointment;
 use Carbon\Carbon;
 
@@ -12,7 +12,7 @@ class AppointmentLoader
     {
         return $this->getAppointmentsAsArray(
             Appointment::where(['student' => $student, 'date' => new Carbon($date)])
-                ->with(['client:name,id', 'service'])
+                ->with(['client:id,name', 'service:name,min_duration,id'])
                 ->get());
     }
 
@@ -21,10 +21,11 @@ class AppointmentLoader
         $appointments = $appointments->toArray();
         $apps = [];
         foreach ($appointments as $appointment) {
-            $apps[] = new ScheduleItem(
+            $apps[] = new ScheduleItemDTO(
                 $appointment['id'],
                 $appointment['time'],
                 $appointment['student'],
+                $appointment['client']['id'],
                 $appointment['client']['name'],
                 $appointment['service']['name'],
                 $appointment['service']['min_duration'],

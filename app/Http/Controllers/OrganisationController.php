@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Concerns\Organisations;
-use App\Concerns\Students;
 use App\Models\Organisation;
+use App\Services\StudentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -12,7 +12,10 @@ use Inertia\Inertia;
 class OrganisationController extends Controller
 {
     use Organisations;
-    use Students;
+
+    public function __construct(
+        private readonly StudentService $studentService,
+    ) {}
 
     /**
      * Display a listing of the resource.
@@ -78,6 +81,7 @@ class OrganisationController extends Controller
     {
         $organisations = $this->getAllOrganisations()->select(['id', 'name', 'postcode', 'lat', 'lng']);
         $favouriteOrgs = $this->getFavouriteOrganisations(Auth::user())->select(['id', 'name', 'postcode', 'lat', 'lng']);
+
         return Inertia::render('organisation/Search', [
             'salons' => $organisations,
             'favouriteSalons' => $favouriteOrgs,
@@ -91,6 +95,6 @@ class OrganisationController extends Controller
 
     public function getAvailable(Request $request)
     {
-        return $this->getAvailableStudents($request->salon, $request->day);
+        return $this->studentService->getAvailableStudents($request->salon, $request->day);
     }
 }

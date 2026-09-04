@@ -49,6 +49,7 @@ const calendarStart = minutesFromTime(startTime);
 const calendarEnd = minutesFromTime(endTime);
 
 const myDiary = page.props.auth.user.id === props.student.id;
+// const myAppointment = page.props.auth.user.id === props.client.id;
 
 const interval = 15; // minutes
 const slots: ComputedRef = computed(() => {
@@ -106,7 +107,9 @@ const serviceChosen = ref();
 const serviceChosenError = ref(false);
 
 function appointmentStatusClass(appointment: any) {
-    if (appointment.status === 'cancelled') {
+    if (!myDiary && appointment.client !== page.props.auth.user.id) {
+        return 'bg-gray-500/10 text-gray-500/10';
+    } else if (appointment.status === 'cancelled') {
         return 'bg-red-500/10 hover:bg-red-500/20 text-red-500';
     } else if (appointment.status === 'confirmed') {
         return 'bg-green-500/10 hover:bg-green-500/20 text-green-500';
@@ -134,7 +137,6 @@ function clicked(event: any) {
 
     for (let i = event.target.value; i < slots.value.length; i++) {
         if (slots.value[i].blocked) {
-            console.log('Free Slots', freeSlotsCount);
             break;
         } else if (i === slots.value.length - 1) {
             freeSlotsCount++;
@@ -244,8 +246,6 @@ watch(serviceChosen, () => {
                                     <div></div>
                                 </div>
 
-                                <!-- Booking Buttons -->
-
                                 <!-- Events -->
                                 <ol
                                     id="popHere"
@@ -264,7 +264,10 @@ watch(serviceChosen, () => {
                                     >
                                         <component
                                             :is="
-                                                !appointment.status
+                                                !appointment.status ||
+                                                (!myDiary &&
+                                                    appointment.client !==
+                                                        page.props.auth.user.id)
                                                     ? 'div'
                                                     : 'a'
                                             "
@@ -281,12 +284,22 @@ watch(serviceChosen, () => {
                                             class="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg px-2 text-xs/5"
                                         >
                                             <p
-                                                v-if="myDiary"
+                                                v-if="
+                                                    myDiary ||
+                                                    appointment.client ===
+                                                        page.props.auth.user.id
+                                                "
                                                 class="font-semibold"
                                             >
-                                                {{ appointment.client }}
+                                                {{ appointment.clientName }}
                                             </p>
-                                            <p>
+                                            <p
+                                                v-if="
+                                                    myDiary ||
+                                                    appointment.client ===
+                                                        page.props.auth.user.id
+                                                "
+                                            >
                                                 {{ appointment.service }}
                                             </p>
                                         </component>

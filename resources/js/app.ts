@@ -48,7 +48,6 @@ createInertiaApp({
     },
     withApp: function (app) {
         setOptions({ key: import.meta.env.VITE_GOOGLE_MAPS_API_KEY });
-        // @ts-expect-error - below code is too complex to expand
         app.component('font-awesome-icon', FontAwesomeIcon);
     },
 }).then((r) => console.log(r));

@@ -35,6 +35,7 @@ const selectedDate: Ref<any> = defineModel();
             v-model="selectedDate"
             :close-on-select="true"
             :is-date-unavailable="(date) => date.day === 15"
+            :weekStartsOn="1"
         >
             <DatePickerField
                 v-slot="{ segments }"

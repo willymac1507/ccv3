@@ -8,6 +8,9 @@ import { defineConfig } from 'vite';
 import vueDevTools from 'vite-plugin-vue-devtools';
 
 export default defineConfig({
+    define: {
+        __VUE_DEV_DEVTOOLS__: false,
+    },
     ssr: {
         noExternal: ['@fortawesome/vue-fontawesome'],
     },

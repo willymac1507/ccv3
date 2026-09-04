@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Concerns;
+namespace App\Services;
 
 use App\Models\Organisation;
 use App\Models\User;
@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use LaravelIdea\Helper\App\Models\_IH_Organisation_C;
 
-trait Students
+readonly class StudentService
 {
     public function getAvailableStudents($organisation, $day): Model|Collection|array|_IH_Organisation_C|Organisation|null
     {

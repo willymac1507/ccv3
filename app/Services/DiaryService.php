@@ -1,14 +1,29 @@
 <?php
 
-namespace App\Domain\Appointment\Diary;
+namespace App\Services;
 
+use App\Domain\Appointment\DTO\DiaryDTO;
 use App\Domain\Appointment\DTO\ScheduleItemDTO;
 use App\Models\Appointment;
+use App\Models\Shift;
 use Carbon\Carbon;
 
-class DiaryMaker
+class DiaryService
 {
-    public function schedule($student, $date, $shift): array
+    public function createDiary($student, $date): DiaryDTO
+    {
+        $shift = $this->getShift($student, $date);
+        $appointments = $this->schedule($student->id, $date, $shift);
+
+        return new DiaryDTO($student, $shift, $appointments, new Carbon($date));
+    }
+
+    private function getShift($user, $date): ?Shift
+    {
+        return Shift::where(['user_id' => $user->id, 'day' => Carbon::parse($date)->format('l')])->first();
+    }
+
+    private function schedule($student, $date, $shift): array
     {
         $appointments = [];
         foreach ($this->getAppointments($student, $date) as $appointment) {

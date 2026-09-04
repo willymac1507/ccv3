@@ -2,33 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Concerns\Organisations;
-use App\Domain\Appointment\Diary\DiaryMaker;
-use App\Domain\Appointment\Diary\Loaders\ShiftLoader;
+use App\Domain\Appointment\DTO\AppointmentDTO;
 use App\Models\Appointment;
 use App\Models\User;
-use Carbon\Carbon;
+use App\Services\AppointmentService;
+use App\Services\DiaryService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class AppointmentController extends Controller
 {
-    use Organisations;
+    public function __construct(
+        private readonly AppointmentService $appointmentService,
+        private readonly DiaryService $diaryService,
+    ) {}
 
     /**
      * Display a listing of the resource.
      */
     public function index(User $student)
     {
-        $shift = new ShiftLoader()->getShift($student, request('date'));
-        $appointments = new DiaryMaker()->schedule($student->id, request('date'), $shift);
+        $diary = $this->diaryService->createDiary($student, request('date'));
 
-        return Inertia::render('appointment/Index', [
-            'student' => $student,
-            'shift' => $shift,
-            'appointments' => $appointments,
-            'date' => new Carbon(request('date')),
-        ]);
+        return Inertia::render('appointment/Index', $diary->toArray());
     }
 
     public function showStudentAppointments(User $user, Request $request)
@@ -41,16 +37,19 @@ class AppointmentController extends Controller
      */
     public function store(Request $request)
     {
-        $appointment = Appointment::create($request->all());
-        $appointment->save();
-    }
+        $appointmentDTO = new AppointmentDTO(
+            $request->input('student'),
+            $request->input('client'),
+            $request->input('date'),
+            $request->input('time'),
+            $request->input('service_id'),
+            'pending'
+        );
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        $appointment = $this->appointmentService->createAppointment($appointmentDTO);
+
+        return redirect()->route('students.appointments.index', [$appointment->student,
+            'date' => $appointment->date, ]);
     }
 
     /**
@@ -83,10 +82,5 @@ class AppointmentController extends Controller
     public function destroy(Appointment $appointment)
     {
         //
-    }
-
-    private function getAppointmentsAsArray($appointments)
-    {
-        return $appointments->toArray();
     }
 }
