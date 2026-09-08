@@ -10,9 +10,12 @@ use Carbon\Carbon;
 
 class DiaryService
 {
-    public function createDiary($student, $date): DiaryDTO
+    public function createDiary($student, $date): ?DiaryDTO
     {
         $shift = $this->getShift($student, $date);
+        if (! $shift->startTime) {
+            return null;
+        }
         $appointments = $this->schedule($student->id, $date, $shift);
 
         return new DiaryDTO($student, $shift, $appointments, new Carbon($date));

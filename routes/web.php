@@ -31,4 +31,4 @@ Route::middleware(['role:Super Admin'])->group(function () {
     Route::get('admin/super/organisation/{organisation:id}/show', [OrganisationController::class, 'show'])->name('admin.super.organisation.show');
 });
 
-require __DIR__ . '/settings.php';
+require __DIR__.'/settings.php';

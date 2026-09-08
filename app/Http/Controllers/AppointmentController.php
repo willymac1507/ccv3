@@ -23,6 +23,11 @@ class AppointmentController extends Controller
     public function index(User $student)
     {
         $diary = $this->diaryService->createDiary($student, request('date'));
+        if (! $diary) {
+            Inertia::flash('toast', ['type' => 'error', 'message' => __('Student has no diary for this date.')]);
+
+            return back();
+        }
 
         return Inertia::render('appointment/Index', $diary->toArray());
     }
