@@ -18,6 +18,12 @@ import {
     SelectValue,
     SelectContent,
 } from '@/components/ui/select';
+import {
+    appointmentStatusClass,
+    minutesFromTime,
+    rowForTime,
+    createSlots,
+} from '@/composables/buildCalendar';
 import { index } from '@/routes/appointments';
 import organisations from '@/routes/organisations';
 import type { Props, PageProps } from '@/types/appointments';
@@ -46,47 +52,12 @@ const allServices: Array<any> = page.props.services;
 const { startTime, endTime } = reactive(page.props.shift);
 
 const calendarStart = minutesFromTime(startTime);
-const calendarEnd = minutesFromTime(endTime);
 
 const myDiary = page.props.auth.user.id === props.student.id;
-// const myAppointment = page.props.auth.user.id === props.client.id;
 
 const interval = 15; // minutes
 const slots: ComputedRef = computed(() => {
-    const result: Array<any> = [];
-
-    for (let mins = calendarStart; mins < calendarEnd; mins += interval) {
-        switch (mins % 60) {
-            case 0:
-                result.push({
-                    label: `${String(Math.trunc(mins / 60)).padStart(2, '0')}:00`,
-                    blocked: false,
-                });
-                break;
-            case 15:
-                result.push({
-                    label: `${String(Math.trunc(mins / 60)).padStart(2, '0')}:15`,
-                    blocked: false,
-                });
-                break;
-            case 30:
-                result.push({
-                    label: `${String(Math.trunc(mins / 60)).padStart(2, '0')}:30`,
-                    blocked: false,
-                });
-                break;
-            case 45:
-                result.push({
-                    label: `${String(Math.trunc(mins / 60)).padStart(2, '0')}:45`,
-                    blocked: false,
-                });
-                break;
-            default:
-                result.push('');
-        }
-    }
-
-    return result;
+    return createSlots(startTime, endTime, interval);
 });
 
 const vBlock = {
@@ -105,31 +76,6 @@ let timeSelected = '';
 const bookForm = ref(false);
 const serviceChosen = ref();
 const serviceChosenError = ref(false);
-
-function appointmentStatusClass(appointment: any) {
-    if (!myDiary && appointment.client !== page.props.auth.user.id) {
-        return 'bg-gray-500/10 text-gray-500/10';
-    } else if (appointment.status === 'cancelled') {
-        return 'bg-red-500/10 hover:bg-red-500/20 text-red-500';
-    } else if (appointment.status === 'confirmed') {
-        return 'bg-green-500/10 hover:bg-green-500/20 text-green-500';
-    } else if (appointment.status === 'pending') {
-        return 'bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-500';
-    } else {
-        return 'bg-blue-500/10 hover:bg-blue-500/20 text-blue-500';
-    }
-}
-
-function minutesFromTime(time: string) {
-    const [hours, minutes] = time.split(':').map(Number);
-
-    return hours * 60 + minutes;
-}
-function rowForTime(time: string) {
-    const [hours, minutes] = time.split(':').map(Number);
-
-    return (hours * 60 - calendarStart + minutes) / interval + 2;
-}
 
 function clicked(event: any) {
     freeSlotsCount = 0;
@@ -256,10 +202,14 @@ watch(serviceChosen, () => {
                                         v-for="appointment in appointments"
                                         :key="appointment.id"
                                         v-block="{
-                                            row: rowForTime(appointment.time),
+                                            row: rowForTime(
+                                                appointment.time,
+                                                calendarStart,
+                                                interval,
+                                            ),
                                             span: appointment.duration,
                                         }"
-                                        :style="`grid-row: ${rowForTime(appointment.time)} / span ${appointment.duration}`"
+                                        :style="`grid-row: ${rowForTime(appointment.time, calendarStart, interval)} / span ${appointment.duration}`"
                                         class="relative z-10 col-start-1 mt-px flex dark:before:pointer-events-none dark:before:absolute dark:before:inset-1 dark:before:z-0 dark:before:rounded-lg dark:before:bg-gray-900"
                                     >
                                         <component
@@ -274,6 +224,8 @@ watch(serviceChosen, () => {
                                             :class="
                                                 appointmentStatusClass(
                                                     appointment,
+                                                    page.props.auth.user.id,
+                                                    myDiary,
                                                 )
                                             "
                                             :href="
@@ -308,7 +260,7 @@ watch(serviceChosen, () => {
                                         v-for="(slot, index) in slots"
                                         v-show="!slot.blocked"
                                         :key="index"
-                                        :style="`grid-row: ${rowForTime(slot.label)} / span 1;`"
+                                        :style="`grid-row: ${rowForTime(slot.label, calendarStart, interval)} / span 1;`"
                                         class="z-1 col-start-1"
                                     >
                                         <button
