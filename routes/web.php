@@ -4,6 +4,7 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrganisationController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::inertia('/', 'Welcome')->name('home');
 
@@ -31,4 +32,8 @@ Route::middleware(['role:Super Admin'])->group(function () {
     Route::get('admin/super/organisation/{organisation:id}/show', [OrganisationController::class, 'show'])->name('admin.super.organisation.show');
 });
 
-require __DIR__.'/settings.php';
+Route::get('chat', function () {
+    return Inertia::render('messaging/LiveChat');
+});
+
+require __DIR__ . '/settings.php';

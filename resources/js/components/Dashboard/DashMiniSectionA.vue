@@ -3,7 +3,7 @@ import { Link } from '@inertiajs/vue3';
 </script>
 
 <template>
-    <Link href="#">
+    <Link href="chat">
         <div class="stats grid items-center pt-3 shadow">
             <div class="stat place-items-center">
                 <div class="stat-title">Messages</div>

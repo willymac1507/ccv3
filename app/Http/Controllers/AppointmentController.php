@@ -42,6 +42,11 @@ class AppointmentController extends Controller
      */
     public function store(Request $request)
     {
+        if (Auth()->user()->cannot(
+            'create',
+            Appointment::class)) {
+            abort(403);
+        }
         $appointmentDTO = new AppointmentDTO(
             $request->input('student'),
             $request->input('client'),
@@ -62,7 +67,11 @@ class AppointmentController extends Controller
      */
     public function show(Appointment $appointment)
     {
-        //
+        if (Auth()->user()->cannot(
+            'view',
+            $appointment)) {
+            abort(403);
+        }
     }
 
     /**
