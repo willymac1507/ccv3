@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Head, usePage } from '@inertiajs/vue3';
+import { Head, router, usePage } from '@inertiajs/vue3';
 import { format } from 'date-fns';
 import type { ComputedRef } from 'vue';
 import { watch } from 'vue';
@@ -18,6 +18,12 @@ import {
     SelectValue,
     SelectContent,
 } from '@/components/ui/select';
+import {
+    appointmentStatusClass,
+    minutesFromTime,
+    rowForTime,
+    createSlots,
+} from '@/composables/buildCalendar';
 import { index } from '@/routes/appointments';
 import organisations from '@/routes/organisations';
 import type { Props, PageProps } from '@/types/appointments';
@@ -25,6 +31,7 @@ import type { Props, PageProps } from '@/types/appointments';
 const props = defineProps<Props>();
 
 defineOptions({
+    inheritAttrs: false,
     layout: {
         breadcrumbs: [
             {
@@ -45,46 +52,12 @@ const allServices: Array<any> = page.props.services;
 const { startTime, endTime } = reactive(page.props.shift);
 
 const calendarStart = minutesFromTime(startTime);
-const calendarEnd = minutesFromTime(endTime);
 
 const myDiary = page.props.auth.user.id === props.student.id;
 
 const interval = 15; // minutes
 const slots: ComputedRef = computed(() => {
-    const result: Array<any> = [];
-
-    for (let mins = calendarStart; mins < calendarEnd; mins += interval) {
-        switch (mins % 60) {
-            case 0:
-                result.push({
-                    label: `${String(Math.trunc(mins / 60)).padStart(2, '0')}:00`,
-                    blocked: false,
-                });
-                break;
-            case 15:
-                result.push({
-                    label: `${String(Math.trunc(mins / 60)).padStart(2, '0')}:15`,
-                    blocked: false,
-                });
-                break;
-            case 30:
-                result.push({
-                    label: `${String(Math.trunc(mins / 60)).padStart(2, '0')}:30`,
-                    blocked: false,
-                });
-                break;
-            case 45:
-                result.push({
-                    label: `${String(Math.trunc(mins / 60)).padStart(2, '0')}:45`,
-                    blocked: false,
-                });
-                break;
-            default:
-                result.push('');
-        }
-    }
-
-    return result;
+    return createSlots(startTime, endTime, interval);
 });
 
 const vBlock = {
@@ -102,30 +75,7 @@ let freeSlotsCount = 0;
 let timeSelected = '';
 const bookForm = ref(false);
 const serviceChosen = ref();
-const serviceDurationError = ref(false);
-
-function appointmentStatusClass(appointment: any) {
-    if (appointment.status === 'cancelled') {
-        return 'bg-red-500/10 hover:bg-red-500/20 text-red-500';
-    } else if (appointment.status === 'confirmed') {
-        return 'bg-green-500/10 hover:bg-green-500/20 text-green-500';
-    } else if (appointment.status === 'pending') {
-        return 'bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-500';
-    } else {
-        return 'bg-blue-500/10 hover:bg-blue-500/20 text-blue-500';
-    }
-}
-
-function minutesFromTime(time: string) {
-    const [hours, minutes] = time.split(':').map(Number);
-
-    return hours * 60 + minutes;
-}
-function rowForTime(time: string) {
-    const [hours, minutes] = time.split(':').map(Number);
-
-    return (hours * 60 - calendarStart + minutes) / interval + 2;
-}
+const serviceChosenError = ref(false);
 
 function clicked(event: any) {
     freeSlotsCount = 0;
@@ -133,7 +83,6 @@ function clicked(event: any) {
 
     for (let i = event.target.value; i < slots.value.length; i++) {
         if (slots.value[i].blocked) {
-            console.log('Free Slots', freeSlotsCount);
             break;
         } else if (i === slots.value.length - 1) {
             freeSlotsCount++;
@@ -143,13 +92,29 @@ function clicked(event: any) {
         freeSlotsCount++;
     }
 
+    serviceChosenError.value = false;
+    serviceChosen.value = '';
     bookForm.value = true;
-    console.log('Clicked: ', timeSelected, 'Free Slots: ', freeSlotsCount);
+}
+
+function bookAppt() {
+    router.post('/appointment/create', {
+        student: props.student.id,
+        client: page.props.auth.user.id,
+        service_id: serviceChosen.value,
+        time: timeSelected,
+        date: format(selectedDate, 'yyyy-MM-dd'),
+    });
+    bookForm.value = false;
 }
 
 watch(serviceChosen, () => {
-    if (serviceChosen.value.duration > freeSlotsCount) {
-        alert('Not enough slots available for this service');
+    if (serviceChosen.value) {
+        const serv = page.props.services[serviceChosen.value - 1];
+
+        serviceChosenError.value = serv.min_duration > freeSlotsCount;
+
+        return serviceChosenError;
     }
 });
 </script>
@@ -227,8 +192,6 @@ watch(serviceChosen, () => {
                                     <div></div>
                                 </div>
 
-                                <!-- Booking Buttons -->
-
                                 <!-- Events -->
                                 <ol
                                     id="popHere"
@@ -239,41 +202,57 @@ watch(serviceChosen, () => {
                                         v-for="appointment in appointments"
                                         :key="appointment.id"
                                         v-block="{
-                                            row: rowForTime(appointment.time),
+                                            row: rowForTime(
+                                                appointment.time,
+                                                calendarStart,
+                                                interval,
+                                            ),
                                             span: appointment.duration,
                                         }"
-                                        :style="`grid-row: ${rowForTime(appointment.time)} / span ${appointment.duration}`"
+                                        :style="`grid-row: ${rowForTime(appointment.time, calendarStart, interval)} / span ${appointment.duration}`"
                                         class="relative z-10 col-start-1 mt-px flex dark:before:pointer-events-none dark:before:absolute dark:before:inset-1 dark:before:z-0 dark:before:rounded-lg dark:before:bg-gray-900"
                                     >
                                         <component
                                             :is="
-                                                !appointment.status
+                                                !appointment.status ||
+                                                (!myDiary &&
+                                                    appointment.client !==
+                                                        page.props.auth.user.id)
                                                     ? 'div'
                                                     : 'a'
                                             "
                                             :class="
                                                 appointmentStatusClass(
                                                     appointment,
+                                                    page.props.auth.user.id,
+                                                    myDiary,
                                                 )
                                             "
                                             :href="
-                                                appointment.description ===
-                                                'Break'
-                                                    ? '#'
-                                                    : '/appointments/' +
-                                                      appointment.id +
-                                                      '/show'
+                                                '/appointments/' +
+                                                appointment.id +
+                                                '/show'
                                             "
                                             class="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg px-2 text-xs/5"
                                         >
                                             <p
-                                                v-if="myDiary"
+                                                v-if="
+                                                    myDiary ||
+                                                    appointment.client ===
+                                                        page.props.auth.user.id
+                                                "
                                                 class="font-semibold"
                                             >
-                                                {{ appointment.client.name }}
+                                                {{ appointment.clientName }}
                                             </p>
-                                            <p>
-                                                {{ appointment.description }}
+                                            <p
+                                                v-if="
+                                                    myDiary ||
+                                                    appointment.client ===
+                                                        page.props.auth.user.id
+                                                "
+                                            >
+                                                {{ appointment.service }}
                                             </p>
                                         </component>
                                     </li>
@@ -281,7 +260,7 @@ watch(serviceChosen, () => {
                                         v-for="(slot, index) in slots"
                                         v-show="!slot.blocked"
                                         :key="index"
-                                        :style="`grid-row: ${rowForTime(slot.label)} / span 1;`"
+                                        :style="`grid-row: ${rowForTime(slot.label, calendarStart, interval)} / span 1;`"
                                         class="z-1 col-start-1"
                                     >
                                         <button
@@ -302,7 +281,7 @@ watch(serviceChosen, () => {
         <Popover v-model:open="bookForm">
             <PopoverTrigger class="h-full w-full"> </PopoverTrigger>
             <PopoverContent>
-                <div class="flex flex-col">
+                <div class="flex flex-col items-center gap-y-4">
                     <Select v-model="serviceChosen">
                         <SelectTrigger>
                             <SelectValue placeholder="Select a service" />
@@ -311,12 +290,30 @@ watch(serviceChosen, () => {
                             <SelectItem
                                 v-for="service in allServices"
                                 :key="'service: ' + service.id"
+                                :disabled="
+                                    service.min_duration > freeSlotsCount
+                                "
                                 :value="service.id"
                             >
-                                {{ service.name }}
+                                {{ service.name }} -
+                                {{ service.min_duration * 15 }} mins
                             </SelectItem>
                         </SelectContent>
                     </Select>
+                    <button
+                        :disabled="serviceChosen === ''"
+                        class="btn btn-primary"
+                        @click="bookAppt()"
+                    >
+                        Book
+                    </button>
+                </div>
+
+                <div v-if="serviceChosenError">
+                    <p>
+                        There is not enough time for this service. Please select
+                        an earlier time.
+                    </p>
                 </div>
             </PopoverContent>
         </Popover>

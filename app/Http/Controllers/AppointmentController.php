@@ -2,96 +2,37 @@
 
 namespace App\Http\Controllers;
 
-use App\Concerns\Organisations;
+use App\Domain\Appointment\DTO\AppointmentDTO;
 use App\Models\Appointment;
-use App\Models\Shift;
 use App\Models\User;
-use Carbon\Carbon;
+use App\Services\AppointmentService;
+use App\Services\DiaryService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class AppointmentController extends Controller
 {
-    use Organisations;
+    public function __construct(
+        private readonly AppointmentService $appointmentService,
+        private readonly DiaryService $diaryService,
+    ) {}
 
     /**
      * Display a listing of the resource.
      */
-    public function index(User $user)
+    public function index(User $student)
     {
-        $appointments = $this->getAppointmentsAsArray(Appointment::where(['student' => $user->id, 'date' => request('date')])
-            ->with('client:name,id')
-            ->get());
-        $student = User::find($user->id);
-        $shift = Shift::where(['user_id' => $user->id, 'day' => Carbon::parse(request('date'))->format('l')])->first();
-        $cleanUpTime = new Carbon($shift['endTime'])->subMinutes(15)->format('H:i:s');
-        $setUpAppt = [
-            'id' => 999999999999999997,
-            'date' => request('date'),
-            'time' => $shift['startTime'],
-            'duration' => 1,
-            'student' => $user->id,
-            'client' => [
-                'id' => $user->id,
-                'name' => $user->name,
-            ],
-            'description' => 'Set up',
-            'status' => '',
-        ];
-        $appointments[] = $setUpAppt;
-        $cleanUpAppt = [
-            'id' => 999999999999999998,
-            'date' => request('date'),
-            'time' => $cleanUpTime,
-            'duration' => 1,
-            'student' => $user->id,
-            'client' => [
-                'id' => $user->id,
-                'name' => $user->name,
-            ],
-            'description' => 'Clean up',
-            'status' => '',
-        ];
-        $appointments[] = $cleanUpAppt;
-        if ($shift['breakTime']) {
-            $break = [
-                'id' => 999999999999999999,
-                'date' => request('date'),
-                'time' => $shift['breakTime'],
-                'duration' => $shift['duration'] / 15,
-                'student' => $user->id,
-                'client' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                ],
-                'description' => 'Break',
-                'status' => '',
-            ];
-            $appointments[] = $break;
+        $diary = $this->diaryService->createDiary($student, request('date'));
+        if (! $diary) {
+            Inertia::flash('toast', ['type' => 'error', 'message' => __('Student has no diary for this date.')]);
+
+            return back();
         }
 
-        return Inertia::render('appointment/Index', [
-            'student' => $student,
-            'appointments' => $appointments ?? '',
-            'shift' => $shift,
-            'date' => new Carbon(request('date')),
-        ]);
-    }
-
-    private function getAppointmentsAsArray($appointments)
-    {
-        return $appointments->toArray();
+        return Inertia::render('appointment/Index', $diary->toArray());
     }
 
     public function showStudentAppointments(User $user, Request $request)
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
     {
         //
     }
@@ -101,7 +42,19 @@ class AppointmentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $appointmentDTO = new AppointmentDTO(
+            $request->input('student'),
+            $request->input('client'),
+            $request->input('date'),
+            $request->input('time'),
+            $request->input('service_id'),
+            'pending'
+        );
+
+        $appointment = $this->appointmentService->createAppointment($appointmentDTO);
+
+        return redirect()->route('students.appointments.index', [$appointment->student,
+            'date' => $appointment->date, ]);
     }
 
     /**

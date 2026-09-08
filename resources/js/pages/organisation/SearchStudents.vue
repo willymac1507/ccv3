@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { Head, Link, useHttp } from '@inertiajs/vue3';
+import { WeekStart } from '@vuepic/vue-datepicker';
 import { format, getDay } from 'date-fns';
 import type { Ref } from 'vue';
 import { watch } from 'vue';
