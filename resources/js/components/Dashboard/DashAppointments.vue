@@ -1,20 +1,18 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import {
     CalendarIcon,
     EllipsisHorizontalIcon,
-    MapPinIcon,
+    ScissorsIcon,
+    FlagIcon,
 } from '@heroicons/vue/20/solid';
 import { router } from '@inertiajs/vue3';
 import { format } from 'date-fns';
 import type { ModelRef } from 'vue';
+import { inject } from 'vue';
 import { watch } from 'vue';
 
-interface Props {
-    meetings: Array<any> | undefined;
-}
-
-const props = defineProps<Props>();
+const meetings: Array<any> | undefined = inject('appointments');
 
 const parentDate: ModelRef<any> = defineModel();
 
@@ -35,7 +33,7 @@ watch(parentDate, (value) =>
         class="mt-4 divide-y divide-gray-100 text-sm/6 lg:col-span-7 xl:col-span-8 dark:divide-white/10"
     >
         <li
-            v-for="meeting in props.meetings"
+            v-for="meeting in meetings"
             :key="meeting.id"
             class="relative flex gap-x-6 py-6 xl:static"
         >
@@ -43,7 +41,7 @@ watch(parentDate, (value) =>
                 <h3
                     class="pr-10 font-semibold text-gray-900 xl:pr-0 dark:text-white"
                 >
-                    {{ meeting.client.name }}
+                    {{ meeting.clientName }}
                 </h3>
                 <dl
                     class="mt-2 flex flex-col text-gray-500 xl:flex-row dark:text-gray-400"
@@ -52,8 +50,8 @@ watch(parentDate, (value) =>
                         <dt class="mt-0.5">
                             <span class="sr-only">Date</span>
                             <CalendarIcon
-                                class="size-5 text-gray-400 dark:text-gray-500"
                                 aria-hidden="true"
+                                class="size-5 text-gray-400 dark:text-gray-500"
                             />
                         </dt>
                         <dd>
@@ -69,12 +67,34 @@ watch(parentDate, (value) =>
                     >
                         <dt class="mt-0.5">
                             <span class="sr-only">Location</span>
-                            <MapPinIcon
-                                class="size-5 text-gray-400 dark:text-gray-500"
+                            <ScissorsIcon
                                 aria-hidden="true"
+                                class="size-5 text-gray-400 dark:text-gray-500"
                             />
                         </dt>
-                        <dd>{{ meeting.location }}</dd>
+                        <dd>
+                            {{ meeting.service }} ({{ meeting.duration * 15 }}
+                            mins)
+                        </dd>
+                    </div>
+                    <div
+                        class="mt-2 flex items-start gap-x-3 xl:mt-0 xl:ml-3.5 xl:border-l xl:border-gray-400/50 xl:pl-3.5 dark:xl:border-gray-500/50"
+                    >
+                        <dt class="mt-0.5">
+                            <span class="sr-only">Location</span>
+                            <FlagIcon
+                                :class="[
+                                    meeting.status === 'cancelled'
+                                        ? 'text-red-500'
+                                        : meeting.status === 'pending'
+                                          ? 'text-yellow-600'
+                                          : 'text-green-500',
+                                ]"
+                                aria-hidden="true"
+                                class="size-5"
+                            />
+                        </dt>
+                        <dd>{{ meeting.status }}</dd>
                     </div>
                 </dl>
             </div>
@@ -87,7 +107,7 @@ watch(parentDate, (value) =>
                 >
                     <span class="absolute -inset-2"></span>
                     <span class="sr-only">Open options</span>
-                    <EllipsisHorizontalIcon class="size-5" aria-hidden="true" />
+                    <EllipsisHorizontalIcon aria-hidden="true" class="size-5" />
                 </MenuButton>
 
                 <transition
@@ -104,25 +124,25 @@ watch(parentDate, (value) =>
                         <div class="py-1">
                             <MenuItem v-slot="{ active }">
                                 <a
-                                    href="#"
                                     :class="[
                                         active
                                             ? 'bg-gray-100 text-gray-900 outline-hidden dark:bg-white/5 dark:text-white'
                                             : 'text-gray-700 dark:text-gray-300',
                                         'block px-4 py-2 text-sm',
                                     ]"
+                                    href="#"
                                     >Open</a
                                 >
                             </MenuItem>
                             <MenuItem v-slot="{ active }">
                                 <a
-                                    href="#"
                                     :class="[
                                         active
                                             ? 'bg-gray-100 text-gray-900 outline-hidden dark:bg-white/5 dark:text-white'
                                             : 'text-gray-700 dark:text-gray-300',
                                         'block px-4 py-2 text-sm',
                                     ]"
+                                    href="#"
                                     >Cancel</a
                                 >
                             </MenuItem>

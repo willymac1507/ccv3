@@ -45,7 +45,7 @@ class HandleInertiaRequests extends Middleware
                 'shifts' => $request->user() ? $request->user()->shifts()->orderBy('dayNumber', 'asc')->get() : null,
             ],
             'services' => Service::all(),
-            'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'mainNavItems' => $this->setNavItems($request),
         ];
     }
@@ -60,7 +60,7 @@ class HandleInertiaRequests extends Middleware
             ],
             [
                 'title' => 'Messages',
-                'href' => '#',
+                'href' => '/chat',
                 'icon' => 'fa-solid fa-envelope',
             ],
             [
