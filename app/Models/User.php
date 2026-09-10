@@ -66,11 +66,15 @@ class User extends Authenticatable implements AuthorizableContract
         return $this->belongsToMany(Service::class);
     }
 
-    //    public function slots(): BelongsToMany
-    //    {
-    //        return $this->belongsToMany(Slot::class);
-    //
-    //    }
+    public function messagesReceived(): HasMany
+    {
+        return $this->hasMany(Message::class, 'receiver');
+    }
+
+    public function messagesSent(): HasMany
+    {
+        return $this->hasMany(Message::class, 'sender');
+    }
 
     /**
      * Get the attributes that should be cast.

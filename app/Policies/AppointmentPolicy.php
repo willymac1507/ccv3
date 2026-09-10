@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\Appointment;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Http\Request;
 
 class AppointmentPolicy
 {
@@ -21,7 +22,7 @@ class AppointmentPolicy
      */
     public function view(User $user, Appointment $appointment): bool
     {
-        return false;
+        return $user->id === $appointment->student || $user->id === $appointment->client;
     }
 
     /**
@@ -29,7 +30,7 @@ class AppointmentPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->hasRole(['student', 'client']);
     }
 
     /**
@@ -37,7 +38,7 @@ class AppointmentPolicy
      */
     public function update(User $user, Appointment $appointment): bool
     {
-        return false;
+        return $user->id === $appointment->student;
     }
 
     /**
@@ -45,7 +46,7 @@ class AppointmentPolicy
      */
     public function delete(User $user, Appointment $appointment): bool
     {
-        return false;
+        return $user->id === $appointment->student || $user->id === $appointment->client;
     }
 
     /**

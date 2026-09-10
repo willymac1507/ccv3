@@ -8,12 +8,18 @@ use App\Models\Appointment;
 use App\Models\Shift;
 use Carbon\Carbon;
 
-class DiaryService
+readonly class DiaryService
 {
+    public function __construct(
+        private AppointmentService $appointmentService
+    )
+    {
+    }
+
     public function createDiary($student, $date): ?DiaryDTO
     {
         $shift = $this->getShift($student, $date);
-        if (! $shift->startTime) {
+        if (!$shift->startTime) {
             return null;
         }
         $appointments = $this->schedule($student->id, $date, $shift);
@@ -29,50 +35,51 @@ class DiaryService
     private function schedule($student, $date, $shift): array
     {
         $appointments = [];
-        foreach ($this->getAppointments($student, $date) as $appointment) {
+        foreach ($this->appointmentService->getAppointments($student, $date) as $appointment) {
             $appointments[] = $appointment;
         }
-        $appointments[] = $this->makeSetupBlock($shift);
-        $appointments[] = $this->makeCleanupBlock($shift);
+        $appointments[] = $this->makeSetupBlock($shift, $date);
+        $appointments[] = $this->makeCleanupBlock($shift, $date);
         if (isset($shift['breakTime'])) {
-            $appointments[] = $this->makeBreakBlock($shift);
+            $appointments[] = $this->makeBreakBlock($shift, $date);
         }
 
         return $appointments;
     }
 
-    private function getAppointments($student, $date): array
-    {
-        return $this->getAppointmentsAsArray(
-            Appointment::where(['student' => $student, 'date' => new Carbon($date)])
-                ->with(['client:id,name', 'service:name,min_duration,id'])
-                ->get());
-    }
+    //    private function getAppointments($student, $date): array
+    //    {
+    //        return $this->getAppointmentsAsArray(
+    //            Appointment::where(['student' => $student, 'date' => new Carbon($date)])
+    //                ->with(['client:id,name', 'service:name,min_duration,id'])
+    //                ->get());
+    //    }
+    //
+    //    private function getAppointmentsAsArray($appointments): array
+    //    {
+    //        $appointments = $appointments->toArray();
+    //        $apps = [];
+    //        foreach ($appointments as $appointment) {
+    //            $apps[] = new ScheduleItemDTO(
+    //                $appointment['id'],
+    //                $appointment['time'],
+    //                $appointment['student'],
+    //                $appointment['client']['id'],
+    //                $appointment['client']['name'],
+    //                $appointment['service']['name'],
+    //                $appointment['service']['min_duration'],
+    //                $appointment['status']
+    //            );
+    //        }
+    //
+    //        return $apps;
+    //    }
 
-    private function getAppointmentsAsArray($appointments): array
-    {
-        $appointments = $appointments->toArray();
-        $apps = [];
-        foreach ($appointments as $appointment) {
-            $apps[] = new ScheduleItemDTO(
-                $appointment['id'],
-                $appointment['time'],
-                $appointment['student'],
-                $appointment['client']['id'],
-                $appointment['client']['name'],
-                $appointment['service']['name'],
-                $appointment['service']['min_duration'],
-                $appointment['status']
-            );
-        }
-
-        return $apps;
-    }
-
-    private function makeSetupBlock($shift): ScheduleItemDTO
+    private function makeSetupBlock($shift, $date): ScheduleItemDTO
     {
         return new ScheduleItemDTO(
             null,
+            $date,
             $shift->startTime,
             $shift->user_id,
             null,
@@ -83,10 +90,11 @@ class DiaryService
         );
     }
 
-    private function makeCleanupBlock($shift): ScheduleItemDTO
+    private function makeCleanupBlock($shift, $date): ScheduleItemDTO
     {
         return new ScheduleItemDTO(
             null,
+            $date,
             new Carbon($shift['endTime'])->subMinutes(15)->format('H:i:s'),
             $shift->user_id,
             null,
@@ -97,10 +105,11 @@ class DiaryService
         );
     }
 
-    private function makeBreakBlock($shift): ScheduleItemDTO
+    private function makeBreakBlock($shift, $date): ScheduleItemDTO
     {
         return new ScheduleItemDTO(
             null,
+            $date,
             $shift['breakTime'],
             $shift->user_id,
             null,

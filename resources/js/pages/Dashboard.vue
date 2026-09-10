@@ -30,6 +30,7 @@ defineOptions({
 const appointments: ComputedRef<any[] | undefined> = computed(
     () => props.appointmentsAsStudent,
 );
+console.log(appointments.value);
 provide('appointments', appointments);
 </script>
 

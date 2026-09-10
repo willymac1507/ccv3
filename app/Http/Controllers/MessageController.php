@@ -2,29 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\AppointmentService;
-use Carbon\Carbon;
+use App\Models\Message;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 
-class DashboardController extends Controller
+class MessageController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function __construct(
-        private readonly AppointmentService $appointmentservice,
-    ) {}
-
     public function index()
     {
-        $date = request('date') ?? Carbon::now()->toDateString();
-        $appointmentsAsStudent = $this->appointmentservice->getAppointments(auth()->id(), $date);
-
-        return Inertia::render('Dashboard', [
-            'appointmentsAsStudent' => $appointmentsAsStudent,
-            'date' => $date,
-        ]);
+        //
     }
 
     /**
@@ -46,7 +34,7 @@ class DashboardController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Message $message)
     {
         //
     }
@@ -54,7 +42,7 @@ class DashboardController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Message $message)
     {
         //
     }
@@ -62,7 +50,7 @@ class DashboardController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Message $message)
     {
         //
     }
@@ -70,7 +58,7 @@ class DashboardController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Message $message)
     {
         //
     }
