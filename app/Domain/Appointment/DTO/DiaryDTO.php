@@ -10,13 +10,11 @@ use Illuminate\Contracts\Support\Arrayable;
 class DiaryDTO implements Arrayable
 {
     public function __construct(
-        public User   $student,
-        public Shift  $shift,
-        public array  $appointments,
+        public User $student,
+        public Shift $shift,
+        public array $appointments,
         public Carbon $date,
-    )
-    {
-    }
+    ) {}
 
     public function toArray(): array
     {

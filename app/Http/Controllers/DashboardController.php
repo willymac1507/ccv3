@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\AppointmentService;
+use App\Services\MessageService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,6 +15,7 @@ class DashboardController extends Controller
      */
     public function __construct(
         private readonly AppointmentService $appointmentservice,
+        private readonly MessageService $messageservice,
     ) {}
 
     public function index()
@@ -24,6 +26,7 @@ class DashboardController extends Controller
         return Inertia::render('Dashboard', [
             'appointmentsAsStudent' => $appointmentsAsStudent,
             'date' => $date,
+            'unreadMessages' => $this->messageservice->getUnread(auth()->id()),
         ]);
     }
 

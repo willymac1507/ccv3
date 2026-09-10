@@ -12,6 +12,7 @@ interface Props {
     logo: string;
     appointmentsAsStudent: Array<any>;
     date: string;
+    unreadMessages: number;
 }
 
 const props = defineProps<Props>();
@@ -44,7 +45,7 @@ provide('appointments', appointments);
             <div
                 class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
             >
-                <DashMiniSectionA />
+                <DashMiniSectionA :unreadMessages="unreadMessages" />
             </div>
             <div
                 class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
